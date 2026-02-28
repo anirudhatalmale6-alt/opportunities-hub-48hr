@@ -1,0 +1,523 @@
+/* ============================================
+   48HoursReady Opportunities Hub
+   Clean, minimal styles — Red & Blue accents
+   ============================================ */
+
+:root {
+    --opphub-red: #D32F2F;
+    --opphub-red-hover: #B71C1C;
+    --opphub-blue: #1565C0;
+    --opphub-blue-hover: #0D47A1;
+    --opphub-dark: #1a1a2e;
+    --opphub-gray: #f5f5f5;
+    --opphub-gray-border: #e0e0e0;
+    --opphub-text: #333;
+    --opphub-text-light: #666;
+    --opphub-white: #fff;
+    --opphub-radius: 8px;
+}
+
+#opphub-landing {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--opphub-text);
+    line-height: 1.6;
+}
+
+#opphub-landing *,
+#opphub-landing *::before,
+#opphub-landing *::after {
+    box-sizing: border-box;
+}
+
+.opphub-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* ===== BUTTONS ===== */
+.opphub-btn {
+    display: inline-block;
+    padding: 12px 28px;
+    border: none;
+    border-radius: var(--opphub-radius);
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.opphub-btn-red {
+    background: var(--opphub-red);
+    color: var(--opphub-white);
+}
+.opphub-btn-red:hover {
+    background: var(--opphub-red-hover);
+    color: var(--opphub-white);
+    text-decoration: none;
+}
+
+.opphub-btn-blue {
+    background: var(--opphub-blue);
+    color: var(--opphub-white);
+}
+.opphub-btn-blue:hover {
+    background: var(--opphub-blue-hover);
+    color: var(--opphub-white);
+    text-decoration: none;
+}
+
+.opphub-btn-outline {
+    background: transparent;
+    color: var(--opphub-text-light);
+    border: 1px solid var(--opphub-gray-border);
+}
+.opphub-btn-outline:hover {
+    background: var(--opphub-gray);
+    text-decoration: none;
+}
+
+.opphub-btn-sm {
+    padding: 8px 18px;
+    font-size: 13px;
+}
+
+.opphub-btn-lg {
+    padding: 16px 36px;
+    font-size: 18px;
+}
+
+.opphub-btn-filter {
+    padding: 10px 24px;
+}
+
+/* ===== HERO SECTION ===== */
+.opphub-hero {
+    background: var(--opphub-white);
+    padding: 80px 0 60px;
+    text-align: center;
+    border-bottom: 3px solid var(--opphub-red);
+}
+
+.opphub-hero-title {
+    font-size: 38px;
+    font-weight: 800;
+    color: var(--opphub-dark);
+    margin: 0 0 16px;
+    line-height: 1.2;
+}
+
+.opphub-hero-subtitle {
+    font-size: 18px;
+    color: var(--opphub-text-light);
+    max-width: 700px;
+    margin: 0 auto 32px;
+}
+
+.opphub-hero-cta {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* ===== FILTER BAR ===== */
+.opphub-filter-bar {
+    background: var(--opphub-white);
+    padding: 24px 0;
+    border-bottom: 1px solid var(--opphub-gray-border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.opphub-filters {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.opphub-filter-group select {
+    padding: 10px 14px;
+    border: 1px solid var(--opphub-gray-border);
+    border-radius: var(--opphub-radius);
+    font-size: 14px;
+    color: var(--opphub-text);
+    background: var(--opphub-white);
+    min-width: 150px;
+    cursor: pointer;
+    appearance: auto;
+}
+
+.opphub-filter-group select:focus {
+    outline: none;
+    border-color: var(--opphub-blue);
+    box-shadow: 0 0 0 2px rgba(21, 101, 192, 0.15);
+}
+
+.opphub-filter-group:last-child {
+    display: flex;
+    gap: 8px;
+}
+
+/* ===== OPPORTUNITIES LIST ===== */
+.opphub-opportunities {
+    background: var(--opphub-gray);
+    padding: 48px 0;
+}
+
+.opphub-results-count {
+    font-size: 14px;
+    color: var(--opphub-text-light);
+    margin-bottom: 24px;
+}
+
+.opphub-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 24px;
+}
+
+/* ===== OPPORTUNITY CARD ===== */
+.opphub-card {
+    background: var(--opphub-white);
+    border-radius: var(--opphub-radius);
+    padding: 24px;
+    border: 1px solid var(--opphub-gray-border);
+    transition: box-shadow 0.2s ease;
+}
+
+.opphub-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+.opphub-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.opphub-card-institution {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--opphub-blue);
+    background: rgba(21, 101, 192, 0.08);
+    padding: 4px 10px;
+    border-radius: 4px;
+}
+
+.opphub-card-status {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 4px;
+}
+
+.opphub-status-open {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.opphub-status-closing_soon {
+    background: #fff3e0;
+    color: #e65100;
+}
+
+.opphub-status-closed {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.opphub-card-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 8px;
+    line-height: 1.3;
+}
+
+.opphub-card-title a {
+    color: var(--opphub-dark);
+    text-decoration: none;
+}
+
+.opphub-card-title a:hover {
+    color: var(--opphub-red);
+}
+
+.opphub-card-desc {
+    font-size: 14px;
+    color: var(--opphub-text-light);
+    margin: 0 0 16px;
+    line-height: 1.5;
+}
+
+.opphub-card-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--opphub-gray-border);
+}
+
+.opphub-card-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--opphub-text-light);
+}
+
+.opphub-meta-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.opphub-card-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* ===== WHY THIS HUB EXISTS ===== */
+.opphub-why {
+    background: var(--opphub-white);
+    padding: 64px 0;
+    text-align: center;
+}
+
+.opphub-why h2 {
+    font-size: 30px;
+    font-weight: 800;
+    margin: 0 0 40px;
+    color: var(--opphub-dark);
+}
+
+.opphub-why-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 32px;
+    max-width: 960px;
+    margin: 0 auto;
+}
+
+.opphub-why-item {
+    padding: 24px;
+}
+
+.opphub-why-icon {
+    font-size: 40px;
+    margin-bottom: 16px;
+}
+
+.opphub-why-item h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 10px;
+    color: var(--opphub-dark);
+}
+
+.opphub-why-item p {
+    font-size: 14px;
+    color: var(--opphub-text-light);
+    margin: 0;
+}
+
+/* ===== CTA PACKAGE ===== */
+.opphub-cta-package {
+    background: linear-gradient(135deg, #1565C0 0%, #D32F2F 100%);
+    padding: 64px 0;
+    text-align: center;
+}
+
+.opphub-package-box {
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 48px;
+    max-width: 600px;
+    margin: 0 auto;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.opphub-package-box h2 {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--opphub-white);
+    margin: 0 0 24px;
+}
+
+.opphub-package-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 32px;
+    text-align: left;
+    display: inline-block;
+}
+
+.opphub-package-list li {
+    font-size: 16px;
+    color: var(--opphub-white);
+    padding: 6px 0;
+}
+
+/* ===== RSS SECTION ===== */
+.opphub-rss-section {
+    background: var(--opphub-gray);
+    padding: 64px 0;
+    text-align: center;
+}
+
+.opphub-rss-section h2 {
+    font-size: 28px;
+    font-weight: 800;
+    margin: 0 0 12px;
+    color: var(--opphub-dark);
+}
+
+.opphub-rss-section p {
+    color: var(--opphub-text-light);
+    margin: 0 0 24px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* ===== PARTNERS LOGO STRIP ===== */
+.opphub-partners {
+    background: var(--opphub-white);
+    padding: 48px 0;
+    text-align: center;
+}
+
+.opphub-partners h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0 0 28px;
+    color: var(--opphub-dark);
+}
+
+.opphub-logos {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 32px;
+    align-items: center;
+}
+
+.opphub-logo-text {
+    font-size: 16px;
+    font-weight: 700;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 12px 20px;
+    border: 1px solid var(--opphub-gray-border);
+    border-radius: var(--opphub-radius);
+}
+
+/* ===== NO RESULTS ===== */
+.opphub-no-results {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 48px;
+    color: var(--opphub-text-light);
+}
+
+/* ===== LOADING STATE ===== */
+.opphub-loading {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 48px;
+}
+
+.opphub-loading::after {
+    content: "";
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--opphub-gray-border);
+    border-top-color: var(--opphub-blue);
+    border-radius: 50%;
+    animation: opphub-spin 0.7s linear infinite;
+}
+
+@keyframes opphub-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .opphub-hero {
+        padding: 48px 0 36px;
+    }
+
+    .opphub-hero-title {
+        font-size: 26px;
+    }
+
+    .opphub-hero-subtitle {
+        font-size: 15px;
+    }
+
+    .opphub-filters {
+        flex-direction: column;
+    }
+
+    .opphub-filter-group select {
+        min-width: 100%;
+    }
+
+    .opphub-cards-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .opphub-why-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .opphub-package-box {
+        padding: 32px 24px;
+    }
+
+    .opphub-package-box h2 {
+        font-size: 22px;
+    }
+
+    .opphub-logos {
+        gap: 16px;
+    }
+
+    .opphub-logo-text {
+        font-size: 12px;
+        padding: 8px 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .opphub-hero-title {
+        font-size: 22px;
+    }
+
+    .opphub-hero-cta {
+        flex-direction: column;
+    }
+
+    .opphub-hero-cta .opphub-btn {
+        width: 100%;
+    }
+
+    .opphub-card-actions {
+        flex-direction: column;
+    }
+
+    .opphub-card-actions .opphub-btn {
+        width: 100%;
+    }
+}
