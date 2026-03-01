@@ -16,14 +16,6 @@ $institutions  = get_terms(['taxonomy' => 'institution', 'hide_empty' => false])
 $funding_types = get_terms(['taxonomy' => 'funding_type', 'hide_empty' => false]);
 $regions       = get_terms(['taxonomy' => 'region', 'hide_empty' => false]);
 $sectors       = get_terms(['taxonomy' => 'sector', 'hide_empty' => false]);
-
-// Query opportunities
-$opportunities = new WP_Query([
-    'post_type'      => 'opportunity',
-    'posts_per_page' => 50,
-    'orderby'        => 'date',
-    'order'          => 'DESC',
-]);
 ?>
 
 <div id="opphub-landing">
@@ -104,18 +96,10 @@ $opportunities = new WP_Query([
     <section class="opphub-opportunities" id="opphub-opportunities">
         <div class="opphub-container">
             <div class="opphub-results-count">
-                <span id="opphub-count"><?php echo $opportunities->found_posts; ?></span> opportunities found
+                <span id="opphub-count">...</span> opportunities found
             </div>
             <div id="opphub-cards" class="opphub-cards-grid">
-                <?php if ($opportunities->have_posts()) :
-                    while ($opportunities->have_posts()) : $opportunities->the_post();
-                        include OPP_HUB_PATH . 'templates/partials/opportunity-card.php';
-                    endwhile;
-                else : ?>
-                    <div class="opphub-no-results">
-                        <p>No opportunities available yet. Check back soon!</p>
-                    </div>
-                <?php endif; wp_reset_postdata(); ?>
+                <div class="opphub-loading" style="text-align:center;padding:40px;color:#666;">Loading opportunities...</div>
             </div>
         </div>
     </section>

@@ -55,4 +55,7 @@
         }, 500);
     });
 
+    // Auto-load opportunities on page load (bypasses Cloudflare page cache)
+    applyFilters();
+
 })(jQuery);
