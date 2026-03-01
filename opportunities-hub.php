@@ -2,14 +2,14 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 2.1.0
+ * Version: 2.2.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
 
 if (!defined('ABSPATH')) exit;
 
-define('OPP_HUB_VERSION', '2.1.0');
+define('OPP_HUB_VERSION', '2.2.0');
 define('OPP_HUB_PATH', plugin_dir_path(__FILE__));
 define('OPP_HUB_URL', plugin_dir_url(__FILE__));
 
@@ -750,8 +750,8 @@ function opphub_maybe_initial_import() {
             }
         }
 
-        // Tag existing Caribbean opportunities with Haiti too
-        opphub_tag_caribbean_with_haiti();
+        // Fix: remove Haiti tag from posts that aren't genuinely about Haiti
+        opphub_fix_haiti_tags();
 
         // Re-import to pick up new feed sources
         opphub_import_from_feeds();
@@ -759,21 +759,40 @@ function opphub_maybe_initial_import() {
 }
 
 /**
- * Add 'Haiti' region to all existing posts that have 'Caribbean' region.
+ * Remove incorrect Haiti tags from posts not actually about Haiti.
+ * Only World Bank Haiti projects and ReliefWeb Haiti posts should have the Haiti region.
  */
-function opphub_tag_caribbean_with_haiti() {
-    $caribbean_posts = get_posts([
+function opphub_fix_haiti_tags() {
+    $haiti_posts = get_posts([
         'post_type'      => 'opportunity',
         'posts_per_page' => -1,
         'post_status'    => 'publish',
         'tax_query'      => [
-            ['taxonomy' => 'region', 'field' => 'slug', 'terms' => 'caribbean'],
+            ['taxonomy' => 'region', 'field' => 'slug', 'terms' => 'haiti'],
         ],
         'fields'         => 'ids',
     ]);
 
-    foreach ($caribbean_posts as $post_id) {
-        wp_set_object_terms($post_id, ['Caribbean', 'Haiti'], 'region');
+    foreach ($haiti_posts as $post_id) {
+        $title   = strtolower(get_the_title($post_id));
+        $content = strtolower(get_post_field('post_content', $post_id));
+        $source  = strtolower(get_post_meta($post_id, '_opphub_source_url', true));
+
+        // Keep Haiti tag only if the post is genuinely about Haiti
+        $is_haiti = (
+            strpos($title, 'haiti') !== false ||
+            strpos($content, 'haiti') !== false ||
+            strpos($source, 'countrycode_exact=HT') !== false ||
+            strpos($source, 'search=haiti') !== false
+        );
+
+        if (!$is_haiti) {
+            // Remove Haiti, keep other regions
+            $current_regions = wp_get_object_terms($post_id, 'region', ['fields' => 'names']);
+            $new_regions = array_filter($current_regions, function($r) { return $r !== 'Haiti'; });
+            if (empty($new_regions)) $new_regions = ['Caribbean'];
+            wp_set_object_terms($post_id, $new_regions, 'region');
+        }
     }
 }
 
@@ -814,14 +833,14 @@ function opphub_import_from_feeds() {
             'url'         => 'https://blogs.iadb.org/caribbean-dev-trends/en/feed/',
             'institution' => 'IDB',
             'type'        => 'Grant',
-            'region'      => ['Caribbean', 'Haiti'],
+            'region'      => ['Caribbean'],
             'sector'      => 'SME',
         ],
         [
             'url'         => 'https://www.caribank.org/rss.xml',
-            'institution' => 'World Bank',
+            'institution' => 'IDB',
             'type'        => 'Loan',
-            'region'      => ['Caribbean', 'Haiti'],
+            'region'      => ['Caribbean'],
             'sector'      => 'SME',
         ],
         [
