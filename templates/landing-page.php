@@ -8,7 +8,7 @@ get_header();
 // Get configurable CTA URL
 $structured_url = get_option('opphub_structured_url', '');
 if (empty($structured_url)) {
-    $structured_url = home_url('/');
+    $structured_url = home_url('/apply-business/');
 }
 
 // Gather taxonomy terms for filters
