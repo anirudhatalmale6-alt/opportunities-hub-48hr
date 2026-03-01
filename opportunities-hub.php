@@ -2,14 +2,14 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 2.6.0
+ * Version: 2.7.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
 
 if (!defined('ABSPATH')) exit;
 
-define('OPP_HUB_VERSION', '2.6.0');
+define('OPP_HUB_VERSION', '2.7.0');
 define('OPP_HUB_PATH', plugin_dir_path(__FILE__));
 define('OPP_HUB_URL', plugin_dir_url(__FILE__));
 
@@ -474,17 +474,42 @@ function opphub_ajax_filter() {
 
     $query = new WP_Query($args);
 
-    // Smart fallback: if 0 results and we had secondary filters, retry with just primary
-    if ($query->found_posts === 0 && !empty($secondary_tax) && !empty($tax_query)) {
-        $args['tax_query'] = array_merge(['relation' => 'AND'], $tax_query);
-        $query = new WP_Query($args);
+    // Fallback 1: drop secondary tax (sector, funding_type)
+    if ($query->found_posts === 0 && !empty($secondary_tax)) {
+        $try_args = $args;
+        $try_args['tax_query'] = !empty($tax_query) ? array_merge(['relation' => 'AND'], $tax_query) : [];
+        if (empty($try_args['tax_query'])) unset($try_args['tax_query']);
+        $query = new WP_Query($try_args);
+        if ($query->found_posts > 0) $args = $try_args;
     }
 
-    // Second fallback: if still 0 and we had meta filters, retry without meta
-    if ($query->found_posts === 0 && !empty($meta_query) && !empty($tax_query)) {
-        unset($args['meta_query']);
-        $args['tax_query'] = array_merge(['relation' => 'AND'], $tax_query);
-        $query = new WP_Query($args);
+    // Fallback 2: also drop meta (deadline, funding size)
+    if ($query->found_posts === 0 && !empty($meta_query)) {
+        $try_args = $args;
+        unset($try_args['meta_query']);
+        $query = new WP_Query($try_args);
+        if ($query->found_posts > 0) $args = $try_args;
+    }
+
+    // Fallback 3: if institution + region both set and still 0, try just institution
+    if ($query->found_posts === 0 && !empty($_POST['institution']) && !empty($_POST['region'])) {
+        $try_args = [
+            'post_type' => 'opportunity', 'posts_per_page' => 50,
+            'orderby' => 'date', 'order' => 'DESC',
+            'tax_query' => [['taxonomy' => 'institution', 'field' => 'slug', 'terms' => sanitize_text_field($_POST['institution'])]],
+        ];
+        $query = new WP_Query($try_args);
+        if ($query->found_posts > 0) $args = $try_args;
+    }
+
+    // Fallback 4: if region set and still 0, try just region
+    if ($query->found_posts === 0 && !empty($_POST['region'])) {
+        $try_args = [
+            'post_type' => 'opportunity', 'posts_per_page' => 50,
+            'orderby' => 'date', 'order' => 'DESC',
+            'tax_query' => [['taxonomy' => 'region', 'field' => 'slug', 'terms' => sanitize_text_field($_POST['region'])]],
+        ];
+        $query = new WP_Query($try_args);
     }
 
     ob_start();
