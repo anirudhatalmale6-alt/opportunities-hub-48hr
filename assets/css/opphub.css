@@ -473,6 +473,11 @@ a.opphub-logo-text:hover {
         font-size: 15px;
     }
 
+    .opphub-filter-bar {
+        position: relative;
+        top: auto;
+    }
+
     .opphub-filters {
         flex-direction: column;
     }

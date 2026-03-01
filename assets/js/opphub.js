@@ -12,7 +12,7 @@
     // Submit filter form via AJAX
     $form.on('submit', function(e) {
         e.preventDefault();
-        applyFilters();
+        applyFilters(true);
     });
 
     // Clear all filters
@@ -21,7 +21,7 @@
         applyFilters();
     });
 
-    function applyFilters() {
+    function applyFilters(scrollToResults) {
         var data = {
             action:          'opphub_filter',
             nonce:           opphub_ajax.nonce,
@@ -33,12 +33,17 @@
             funding_size:    $('#filter-funding-size').val()
         };
 
-        $cards.html('<div class="opphub-loading"></div>');
+        $cards.html('<div class="opphub-loading" style="text-align:center;padding:40px;color:#666;">Loading...</div>');
 
         $.post(opphub_ajax.ajax_url, data, function(response) {
             if (response.success) {
                 $cards.html(response.data.html);
                 $count.text(response.data.count);
+                if (scrollToResults) {
+                    $('html, body').animate({
+                        scrollTop: $('#opphub-opportunities').offset().top - 20
+                    }, 400);
+                }
             } else {
                 $cards.html('<div class="opphub-no-results"><p>Something went wrong. Please try again.</p></div>');
             }
