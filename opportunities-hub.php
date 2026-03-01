@@ -2,14 +2,14 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 1.5.0
+ * Version: 1.6.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
 
 if (!defined('ABSPATH')) exit;
 
-define('OPP_HUB_VERSION', '1.5.0');
+define('OPP_HUB_VERSION', '1.6.0');
 define('OPP_HUB_PATH', plugin_dir_path(__FILE__));
 define('OPP_HUB_URL', plugin_dir_url(__FILE__));
 
@@ -324,6 +324,17 @@ Region: <?php echo esc_html(implode(', ', wp_list_pluck($regions, 'name'))); ?>
 // ============================================================
 // 6. ENQUEUE FRONT-END ASSETS
 // ============================================================
+// Prevent Cloudflare/browser caching of the funding hub page
+add_action('template_redirect', 'opphub_no_cache_headers');
+function opphub_no_cache_headers() {
+    if (is_page('funding-hub') || (is_page() && get_page_template_slug() === 'opphub-landing.php')) {
+        nocache_headers();
+        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+        header('Pragma: no-cache');
+        header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
+    }
+}
+
 add_action('wp_enqueue_scripts', 'opphub_enqueue_assets');
 function opphub_enqueue_assets() {
     if (is_page('funding-hub') || (is_page() && get_page_template_slug() === 'opphub-landing.php')) {

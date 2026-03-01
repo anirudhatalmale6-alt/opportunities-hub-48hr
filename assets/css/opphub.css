@@ -420,6 +420,13 @@
     padding: 12px 20px;
     border: 1px solid var(--opphub-gray-border);
     border-radius: var(--opphub-radius);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+a.opphub-logo-text:hover {
+    color: var(--opphub-blue);
+    border-color: var(--opphub-blue);
+    background: rgba(25, 118, 210, 0.05);
 }
 
 /* ===== NO RESULTS ===== */

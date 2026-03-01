@@ -176,13 +176,14 @@ $opportunities = new WP_Query([
         <div class="opphub-container">
             <h2>Partners &amp; Institutions</h2>
             <div class="opphub-logos">
-                <span class="opphub-logo-text">IDB</span>
-                <span class="opphub-logo-text">World Bank</span>
-                <span class="opphub-logo-text">UN</span>
-                <span class="opphub-logo-text">BRH</span>
-                <span class="opphub-logo-text">Unibank</span>
-                <span class="opphub-logo-text">Chambers of Commerce</span>
-                <span class="opphub-logo-text">Microfinance Networks</span>
+                <a href="https://www.iadb.org/" target="_blank" rel="noopener" class="opphub-logo-text">IDB</a>
+                <a href="https://www.worldbank.org/" target="_blank" rel="noopener" class="opphub-logo-text">World Bank</a>
+                <a href="https://www.un.org/" target="_blank" rel="noopener" class="opphub-logo-text">UN</a>
+                <a href="https://www.greenclimate.fund/" target="_blank" rel="noopener" class="opphub-logo-text">Green Climate Fund</a>
+                <a href="https://www.brh.ht/" target="_blank" rel="noopener" class="opphub-logo-text">BRH</a>
+                <a href="https://www.unibankhaiti.com/" target="_blank" rel="noopener" class="opphub-logo-text">Unibank</a>
+                <a href="https://www.usaid.gov/" target="_blank" rel="noopener" class="opphub-logo-text">USAID</a>
+                <a href="https://www.adb.org/" target="_blank" rel="noopener" class="opphub-logo-text">ADB</a>
             </div>
         </div>
     </section>
