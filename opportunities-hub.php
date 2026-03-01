@@ -2,14 +2,14 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 2.3.0
+ * Version: 2.4.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
 
 if (!defined('ABSPATH')) exit;
 
-define('OPP_HUB_VERSION', '2.3.0');
+define('OPP_HUB_VERSION', '2.4.0');
 define('OPP_HUB_PATH', plugin_dir_path(__FILE__));
 define('OPP_HUB_URL', plugin_dir_url(__FILE__));
 
@@ -671,8 +671,10 @@ function opphub_settings_menu() {
 function opphub_settings_page() {
     // Handle manual import trigger
     if (isset($_POST['opphub_import_now']) && check_admin_referer('opphub_settings_nonce')) {
+        opphub_fix_haiti_tags();
+        opphub_seed_haiti_opportunities();
         $count = opphub_import_from_feeds();
-        echo '<div class="notice notice-success"><p>Import complete! ' . intval($count) . ' new opportunities imported.</p></div>';
+        echo '<div class="notice notice-success"><p>Import complete! ' . intval($count) . ' new opportunities imported. Haiti projects seeded.</p></div>';
     }
 
     if (isset($_POST['opphub_save_settings']) && check_admin_referer('opphub_settings_nonce')) {
@@ -730,6 +732,9 @@ add_action('opphub_cron_import', 'opphub_import_from_feeds');
 // Run import on plugin activation and version update
 add_action('init', 'opphub_maybe_initial_import', 100);
 function opphub_maybe_initial_import() {
+    // Always check if Haiti/World Bank data is missing and seed it
+    opphub_ensure_haiti_data();
+
     if (get_option('opphub_import_version') !== OPP_HUB_VERSION) {
         update_option('opphub_import_version', OPP_HUB_VERSION);
 
@@ -758,6 +763,39 @@ function opphub_maybe_initial_import() {
 
         // Re-import to pick up new feed sources
         opphub_import_from_feeds();
+    }
+}
+
+/**
+ * Ensure Haiti/World Bank data exists — runs on every page load (lightweight check).
+ */
+function opphub_ensure_haiti_data() {
+    // Quick check: do any World Bank posts exist?
+    $wb_count = get_posts([
+        'post_type'      => 'opportunity',
+        'post_status'    => 'publish',
+        'numberposts'    => 1,
+        'tax_query'      => [
+            ['taxonomy' => 'institution', 'field' => 'slug', 'terms' => 'world-bank'],
+        ],
+        'fields'         => 'ids',
+    ]);
+
+    if (empty($wb_count)) {
+        // No World Bank posts — ensure taxonomies exist then seed
+        opphub_register_post_type();
+        $terms_to_ensure = [
+            'institution' => ['IDB', 'World Bank', 'UN', 'USAID'],
+            'region'      => ['Haiti', 'Caribbean', 'Global', 'Latin America'],
+            'funding_type'=> ['Grant', 'Loan'],
+            'sector'      => ['SME', 'Agriculture', 'Health', 'Education', 'Energy', 'Tech', 'NGO'],
+        ];
+        foreach ($terms_to_ensure as $tax => $terms) {
+            foreach ($terms as $t) {
+                if (!term_exists($t, $tax)) wp_insert_term($t, $tax);
+            }
+        }
+        opphub_seed_haiti_opportunities();
     }
 }
 
