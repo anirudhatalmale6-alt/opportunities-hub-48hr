@@ -2,14 +2,14 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 2.2.0
+ * Version: 2.3.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
 
 if (!defined('ABSPATH')) exit;
 
-define('OPP_HUB_VERSION', '2.2.0');
+define('OPP_HUB_VERSION', '2.3.0');
 define('OPP_HUB_PATH', plugin_dir_path(__FILE__));
 define('OPP_HUB_URL', plugin_dir_url(__FILE__));
 
@@ -753,8 +753,123 @@ function opphub_maybe_initial_import() {
         // Fix: remove Haiti tag from posts that aren't genuinely about Haiti
         opphub_fix_haiti_tags();
 
+        // Seed Haiti opportunities from World Bank (hardcoded, no API dependency)
+        opphub_seed_haiti_opportunities();
+
         // Re-import to pick up new feed sources
         opphub_import_from_feeds();
+    }
+}
+
+/**
+ * Seed Haiti-specific World Bank opportunities directly (no API dependency).
+ */
+function opphub_seed_haiti_opportunities() {
+    $haiti_projects = [
+        [
+            'title'  => 'Haiti Renewable Energy For All',
+            'url'    => 'https://projects.worldbank.org/en/projects-operations/project-detail/P181584',
+            'amount' => 40000000,
+            'sector' => 'Energy',
+            'desc'   => 'World Bank project to expand renewable energy access across Haiti. Total commitment: $40,000,000. Status: Active.',
+        ],
+        [
+            'title'  => 'Haiti Caribbean Air Transport Connectivity Project',
+            'url'    => 'https://projects.worldbank.org/en/projects-operations/project-detail/P181119',
+            'amount' => 12000000,
+            'sector' => 'SME',
+            'desc'   => 'World Bank project to improve air transport connectivity in Haiti and the Caribbean. Total commitment: $12,000,000. Status: Active.',
+        ],
+        [
+            'title'  => 'Haiti Rural Water and Sanitation Project',
+            'url'    => 'https://projects.worldbank.org/en/projects-operations/project-detail/P178188',
+            'amount' => 80000000,
+            'sector' => 'Health',
+            'desc'   => 'Decentralized sustainable and resilient rural water and sanitation project for Haiti. Total commitment: $80,000,000. Status: Active.',
+        ],
+        [
+            'title'  => 'Haiti Emergency Resilient Agriculture for Food Security',
+            'url'    => 'https://projects.worldbank.org/en/projects-operations/project-detail/P179799',
+            'amount' => 50000000,
+            'sector' => 'Agriculture',
+            'desc'   => 'Emergency resilient agriculture project to strengthen food security in Haiti. Total commitment: $50,000,000. Status: Active.',
+        ],
+        [
+            'title'  => 'Strengthening Primary Health Care and Surveillance in Haiti',
+            'url'    => 'https://projects.worldbank.org/en/projects-operations/project-detail/P178755',
+            'amount' => 20000000,
+            'sector' => 'Health',
+            'desc'   => 'World Bank project to strengthen primary health care and disease surveillance in Haiti. Total commitment: $20,000,000. Status: Active.',
+        ],
+        [
+            'title'  => 'Haiti Resilient Connectivity and Urban Transport Project',
+            'url'    => 'https://projects.worldbank.org/en/projects-operations/project-detail/P177210',
+            'amount' => 120000000,
+            'sector' => 'SME',
+            'desc'   => 'World Bank project for resilient connectivity and urban transport accessibility in Haiti. Total commitment: $120,000,000. Status: Active.',
+        ],
+        [
+            'title'  => 'Haiti Emergency Resilient Agriculture Project',
+            'url'    => 'https://projects.worldbank.org/en/projects-operations/project-detail/P177072',
+            'amount' => 102000000,
+            'sector' => 'Agriculture',
+            'desc'   => 'World Bank emergency resilient agriculture for food security in Haiti. Total commitment: $102,000,000. Status: Active.',
+        ],
+        [
+            'title'  => 'Haiti Equitable Sustainable and Safer Education',
+            'url'    => 'https://projects.worldbank.org/en/projects-operations/project-detail/P176406',
+            'amount' => 90000000,
+            'sector' => 'Education',
+            'desc'   => 'Promoting a more equitable, sustainable, and safer education system in Haiti. Total commitment: $90,000,000. Status: Active.',
+        ],
+        [
+            'title'  => 'Haiti Private Sector Jobs and Economic Transformation',
+            'url'    => 'https://projects.worldbank.org/en/projects-operations/project-detail/P173743',
+            'amount' => 75000000,
+            'sector' => 'SME',
+            'desc'   => 'World Bank project to promote private sector jobs and economic transformation in Haiti. Total commitment: $75,000,000. Status: Active.',
+        ],
+        [
+            'title'  => 'Haiti Adaptive Social Protection for Increased Resilience',
+            'url'    => 'https://projects.worldbank.org/en/projects-operations/project-detail/P174111',
+            'amount' => 75000000,
+            'sector' => 'NGO',
+            'desc'   => 'Adaptive social protection for increased resilience in Haiti. Total commitment: $75,000,000. Status: Active.',
+        ],
+        [
+            'title'  => 'Haiti Digital Acceleration Project',
+            'url'    => 'https://projects.worldbank.org/en/projects-operations/project-detail/P171976',
+            'amount' => 60000000,
+            'sector' => 'Tech',
+            'desc'   => 'World Bank project to accelerate digital infrastructure and connectivity in Haiti. Total commitment: $60,000,000. Status: Active.',
+        ],
+        [
+            'title'  => 'Haiti Climate Resilience and Disaster Risk Management',
+            'url'    => 'https://projects.worldbank.org/en/projects-operations/project-detail/P178747',
+            'amount' => 11000000,
+            'sector' => 'NGO',
+            'desc'   => 'Strengthening disaster risk management and climate resilience in Haiti. Total commitment: $11,000,000. Status: Active.',
+        ],
+    ];
+
+    foreach ($haiti_projects as $project) {
+        if (opphub_post_exists($project['title'], $project['url'])) continue;
+
+        $config = [
+            'institution' => 'World Bank',
+            'type'        => 'Loan',
+            'region'      => ['Haiti', 'Caribbean'],
+            'sector'      => $project['sector'],
+            'funding_max' => $project['amount'],
+        ];
+
+        opphub_create_opportunity(
+            $project['title'],
+            $project['desc'],
+            current_time('mysql'),
+            $project['url'],
+            $config
+        );
     }
 }
 
