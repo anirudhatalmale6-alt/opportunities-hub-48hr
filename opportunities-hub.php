@@ -2,14 +2,14 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 1.6.0
+ * Version: 1.7.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
 
 if (!defined('ABSPATH')) exit;
 
-define('OPP_HUB_VERSION', '1.6.0');
+define('OPP_HUB_VERSION', '1.7.0');
 define('OPP_HUB_PATH', plugin_dir_path(__FILE__));
 define('OPP_HUB_URL', plugin_dir_url(__FILE__));
 
@@ -670,11 +670,8 @@ add_action('init', 'opphub_maybe_initial_import', 100);
 function opphub_maybe_initial_import() {
     if (get_option('opphub_import_version') !== OPP_HUB_VERSION) {
         update_option('opphub_import_version', OPP_HUB_VERSION);
-        // Run initial import in a non-blocking way
-        if (!get_option('opphub_first_import_done')) {
-            opphub_import_from_feeds();
-            update_option('opphub_first_import_done', true);
-        }
+        // Re-import on every version update to pick up new feed sources
+        opphub_import_from_feeds();
     }
 }
 
@@ -687,18 +684,18 @@ function opphub_import_from_feeds() {
             'institution' => 'Global',
             'type'        => 'Grant',
             'region'      => 'Global',
-            'sector'      => '',
+            'sector'      => 'SME',
         ],
         [
-            'url'         => 'https://reliefweb.int/updates/rss.xml',
-            'institution' => 'UN',
-            'type'        => 'Grant',
+            'url'         => 'https://search.worldbank.org/api/v2/projects?format=atom&rows=10',
+            'institution' => 'World Bank',
+            'type'        => 'Loan',
             'region'      => 'Global',
-            'sector'      => 'NGO',
+            'sector'      => 'SME',
         ],
         [
-            'url'         => 'https://news.un.org/feed/subscribe/en/news/topic/economic-development/feed/rss.xml',
-            'institution' => 'UN',
+            'url'         => 'https://search.worldbank.org/api/v2/news?format=atom&rows=10',
+            'institution' => 'World Bank',
             'type'        => 'Grant',
             'region'      => 'Global',
             'sector'      => 'SME',
@@ -711,6 +708,13 @@ function opphub_import_from_feeds() {
             'sector'      => 'Energy',
         ],
         [
+            'url'         => 'https://news.un.org/feed/subscribe/en/news/topic/economic-development/feed/rss.xml',
+            'institution' => 'UN',
+            'type'        => 'Grant',
+            'region'      => 'Global',
+            'sector'      => 'SME',
+        ],
+        [
             'url'         => 'https://blogs.iadb.org/ideas-matter/en/feed/',
             'institution' => 'IDB',
             'type'        => 'Grant',
@@ -718,11 +722,18 @@ function opphub_import_from_feeds() {
             'sector'      => 'SME',
         ],
         [
-            'url'         => 'https://www.adb.org/rss.xml',
-            'institution' => 'World Bank',
+            'url'         => 'https://www.caribank.org/rss.xml',
+            'institution' => 'IDB',
             'type'        => 'Loan',
-            'region'      => 'Asia Pacific',
+            'region'      => 'Caribbean',
             'sector'      => 'SME',
+        ],
+        [
+            'url'         => 'https://reliefweb.int/updates/rss.xml',
+            'institution' => 'UN',
+            'type'        => 'Grant',
+            'region'      => 'Global',
+            'sector'      => 'NGO',
         ],
     ];
 
