@@ -2,14 +2,14 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 2.4.0
+ * Version: 2.5.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
 
 if (!defined('ABSPATH')) exit;
 
-define('OPP_HUB_VERSION', '2.4.0');
+define('OPP_HUB_VERSION', '2.5.0');
 define('OPP_HUB_PATH', plugin_dir_path(__FILE__));
 define('OPP_HUB_URL', plugin_dir_url(__FILE__));
 
@@ -339,9 +339,9 @@ function opphub_no_cache_headers() {
 add_action('wp_enqueue_scripts', 'opphub_enqueue_assets');
 function opphub_enqueue_assets() {
     if (is_page('funding-hub') || (is_page() && get_page_template_slug() === 'opphub-landing.php')) {
-        wp_enqueue_style('opphub-style', OPP_HUB_URL . 'assets/css/opphub.css', [], OPP_HUB_VERSION);
-        wp_enqueue_script('opphub-script', OPP_HUB_URL . 'assets/js/opphub.js', ['jquery'], OPP_HUB_VERSION, true);
-        wp_localize_script('opphub-script', 'opphub_ajax', [
+        wp_enqueue_style('opphub-v2', OPP_HUB_URL . 'assets/css/opphub-v2.css', [], OPP_HUB_VERSION);
+        wp_enqueue_script('opphub-v2', OPP_HUB_URL . 'assets/js/opphub-v2.js', ['jquery'], OPP_HUB_VERSION, true);
+        wp_localize_script('opphub-v2', 'opphub_ajax', [
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce'    => wp_create_nonce('opphub_filter'),
         ]);
@@ -767,10 +767,22 @@ function opphub_maybe_initial_import() {
 }
 
 /**
- * Ensure Haiti/World Bank data exists — runs on every page load (lightweight check).
+ * Ensure Haiti/World Bank data and terms exist — runs on every init.
  */
 function opphub_ensure_haiti_data() {
-    // Quick check: do any World Bank posts exist?
+    // Always ensure Haiti term exists (lightweight check)
+    if (!term_exists('Haiti', 'region')) {
+        opphub_register_post_type();
+        wp_insert_term('Haiti', 'region');
+    }
+
+    // Ensure World Bank term exists
+    if (!term_exists('World Bank', 'institution')) {
+        opphub_register_post_type();
+        wp_insert_term('World Bank', 'institution');
+    }
+
+    // Check if any World Bank posts exist, seed if not
     $wb_count = get_posts([
         'post_type'      => 'opportunity',
         'post_status'    => 'publish',
@@ -782,8 +794,6 @@ function opphub_ensure_haiti_data() {
     ]);
 
     if (empty($wb_count)) {
-        // No World Bank posts — ensure taxonomies exist then seed
-        opphub_register_post_type();
         $terms_to_ensure = [
             'institution' => ['IDB', 'World Bank', 'UN', 'USAID'],
             'region'      => ['Haiti', 'Caribbean', 'Global', 'Latin America'],
