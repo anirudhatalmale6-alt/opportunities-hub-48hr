@@ -2,14 +2,14 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 1.3.0
+ * Version: 1.4.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
 
 if (!defined('ABSPATH')) exit;
 
-define('OPP_HUB_VERSION', '1.3.0');
+define('OPP_HUB_VERSION', '1.4.0');
 define('OPP_HUB_PATH', plugin_dir_path(__FILE__));
 define('OPP_HUB_URL', plugin_dir_url(__FILE__));
 
@@ -516,34 +516,60 @@ function opphub_cta_html() {
         if(document.getElementById('opphub-inline-cta'))return;
         if(window.location.pathname.indexOf('funding-hub')!==-1)return;
 
-        // Find the "Start Free Learning" button/link on the page
-        var allLinks=document.querySelectorAll('a, button, span, div');
-        var target=null;
-        for(var i=0;i<allLinks.length;i++){
-            var txt=(allLinks[i].textContent||'').trim().toLowerCase();
-            if(txt.indexOf('start free learning')!==-1){
-                // Walk up to find the parent wrapper element
-                target=allLinks[i].closest('.elementor-widget')||allLinks[i].closest('.elementor-element')||allLinks[i].parentElement;
-                break;
-            }
-        }
-
         var cta=document.createElement('div');
         cta.id='opphub-inline-cta';
         cta.innerHTML='<a href="<?php echo $hub_url; ?>">&#128176; Explore Funding Opportunities</a>';
 
-        if(target&&target.parentNode){
-            // Insert right after the "Start Free Learning" element
-            target.parentNode.insertBefore(cta,target.nextSibling);
-        } else {
-            // Fallback: find the main content area and prepend near the top
-            var main=document.querySelector('.elementor-section-wrap')||document.querySelector('#content')||document.querySelector('main')||document.body;
-            if(main.children.length>2){
-                main.insertBefore(cta,main.children[2]);
-            } else {
-                main.appendChild(cta);
+        // Strategy 1: Find "Choose the application type" and insert BEFORE it
+        var allEls=document.querySelectorAll('h1,h2,h3,h4,h5,h6,p,span,div');
+        var target=null;
+        for(var i=0;i<allEls.length;i++){
+            var txt=(allEls[i].textContent||'').trim().toLowerCase();
+            if(txt.indexOf('choose the application type')!==-1){
+                target=allEls[i].closest('.elementor-widget')||allEls[i].closest('.elementor-element')||allEls[i].closest('.elementor-section')||allEls[i].parentElement;
+                break;
             }
         }
+        if(target&&target.parentNode){
+            target.parentNode.insertBefore(cta,target);
+            return;
+        }
+
+        // Strategy 2: Find "Start Free Learning" image/link
+        var imgs=document.querySelectorAll('img,a');
+        for(var j=0;j<imgs.length;j++){
+            var src=(imgs[j].src||imgs[j].href||'').toLowerCase();
+            var alt=(imgs[j].alt||imgs[j].textContent||'').toLowerCase();
+            if(alt.indexOf('start free learning')!==-1||alt.indexOf('free learning')!==-1){
+                target=imgs[j].closest('.elementor-widget')||imgs[j].closest('.elementor-element')||imgs[j].parentElement;
+                if(target&&target.parentNode){
+                    target.parentNode.insertBefore(cta,target.nextSibling);
+                    return;
+                }
+            }
+        }
+
+        // Strategy 3: Find "How do I get paid?" section and insert after it
+        for(var k=0;k<allEls.length;k++){
+            var t2=(allEls[k].textContent||'').trim().toLowerCase();
+            if(t2==='how do i get paid?'){
+                var sec=allEls[k].closest('.elementor-section')||allEls[k].closest('.elementor-element')||allEls[k].parentElement;
+                if(sec&&sec.parentNode){
+                    // Go up to find a sibling that's 2-3 siblings after (past Start Free Learning)
+                    var sib=sec.nextElementSibling;
+                    if(sib)sib=sib.nextElementSibling;
+                    if(sib){
+                        sib.parentNode.insertBefore(cta,sib);
+                        return;
+                    }
+                }
+            }
+        }
+
+        // Final fallback: append to body as floating
+        cta.style.cssText='position:fixed;bottom:0;left:0;right:0;z-index:999999;padding:0';
+        cta.querySelector('a').style.cssText+='display:block;border-radius:0;width:100%';
+        document.body.appendChild(cta);
     })();
     </script>
     <?php
