@@ -174,4 +174,36 @@ $sectors       = get_terms(['taxonomy' => 'sector', 'hide_empty' => false]);
 
 </div>
 
+<script>
+/* Inline auto-loader — bypasses Cloudflare JS cache */
+(function(){
+    if (typeof jQuery === 'undefined' || typeof opphub_ajax === 'undefined') return;
+    jQuery(function($){
+        var $cards = $('#opphub-cards');
+        var $count = $('#opphub-count');
+        if ($cards.length && ($count.text() === '...' || $count.text() === '0' || $cards.find('.opphub-loading').length)) {
+            $.post(opphub_ajax.ajax_url, {action:'opphub_filter', nonce:opphub_ajax.nonce}, function(r){
+                if(r.success){$cards.html(r.data.html);$count.text(r.data.count);}
+            });
+        }
+        /* Ensure filter form works */
+        $('#opphub-filter-form').off('submit.opphub').on('submit.opphub', function(e){
+            e.preventDefault();
+            var data = {action:'opphub_filter', nonce:opphub_ajax.nonce,
+                institution:$('#filter-institution').val(), funding_type:$('#filter-funding-type').val(),
+                region:$('#filter-region').val(), sector:$('#filter-sector').val(),
+                deadline_status:$('#filter-deadline').val(), funding_size:$('#filter-funding-size').val()};
+            $cards.html('<div style="text-align:center;padding:40px;color:#666;">Loading...</div>');
+            $.post(opphub_ajax.ajax_url, data, function(r){
+                if(r.success){$cards.html(r.data.html);$count.text(r.data.count);
+                    $('html,body').animate({scrollTop:$('#opphub-opportunities').offset().top-20},400);}
+            });
+        });
+        $('#opphub-clear-filters').off('click.opphub').on('click.opphub', function(){
+            $('#opphub-filter-form').find('select').val('');
+            $('#opphub-filter-form').trigger('submit');
+        });
+    });
+})();
+</script>
 <?php get_footer(); ?>

@@ -2,14 +2,14 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 2.5.0
+ * Version: 2.6.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
 
 if (!defined('ABSPATH')) exit;
 
-define('OPP_HUB_VERSION', '2.5.0');
+define('OPP_HUB_VERSION', '2.6.0');
 define('OPP_HUB_PATH', plugin_dir_path(__FILE__));
 define('OPP_HUB_URL', plugin_dir_url(__FILE__));
 
@@ -339,9 +339,10 @@ function opphub_no_cache_headers() {
 add_action('wp_enqueue_scripts', 'opphub_enqueue_assets');
 function opphub_enqueue_assets() {
     if (is_page('funding-hub') || (is_page() && get_page_template_slug() === 'opphub-landing.php')) {
-        wp_enqueue_style('opphub-v2', OPP_HUB_URL . 'assets/css/opphub-v2.css', [], OPP_HUB_VERSION);
-        wp_enqueue_script('opphub-v2', OPP_HUB_URL . 'assets/js/opphub-v2.js', ['jquery'], OPP_HUB_VERSION, true);
-        wp_localize_script('opphub-v2', 'opphub_ajax', [
+        $cache_bust = OPP_HUB_VERSION . '.' . time();
+        wp_enqueue_style('opphub-style', OPP_HUB_URL . 'assets/css/opphub.css', [], $cache_bust);
+        wp_enqueue_script('opphub-script', OPP_HUB_URL . 'assets/js/opphub.js', ['jquery'], $cache_bust, true);
+        wp_localize_script('opphub-script', 'opphub_ajax', [
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce'    => wp_create_nonce('opphub_filter'),
         ]);
