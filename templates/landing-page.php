@@ -175,18 +175,39 @@ $sectors       = get_terms(['taxonomy' => 'sector', 'hide_empty' => false]);
 </div>
 
 <script>
-/* Inline auto-loader — bypasses Cloudflare JS cache */
+/* Inline auto-loader v2.9 — bypasses Cloudflare page & JS cache */
 (function(){
     if (typeof jQuery === 'undefined' || typeof opphub_ajax === 'undefined') return;
     jQuery(function($){
         var $cards = $('#opphub-cards');
         var $count = $('#opphub-count');
+
+        /* 1. Dynamically populate filter dropdowns via AJAX (bypasses Cloudflare HTML cache) */
+        $.post(opphub_ajax.ajax_url, {action:'opphub_get_options'}, function(r){
+            if(!r.success) return;
+            var opts = r.data;
+            var map = {institution:'#filter-institution', funding_type:'#filter-funding-type', region:'#filter-region', sector:'#filter-sector'};
+            for(var tax in map){
+                var $sel = $(map[tax]);
+                if(!$sel.length || !opts[tax]) continue;
+                var cur = $sel.val();
+                var first = $sel.find('option:first').text();
+                $sel.empty().append('<option value="">' + first + '</option>');
+                for(var i=0;i<opts[tax].length;i++){
+                    $sel.append('<option value="'+opts[tax][i].slug+'">'+opts[tax][i].name+'</option>');
+                }
+                if(cur) $sel.val(cur);
+            }
+        });
+
+        /* 2. Auto-load opportunities on page load */
         if ($cards.length && ($count.text() === '...' || $count.text() === '0' || $cards.find('.opphub-loading').length)) {
             $.post(opphub_ajax.ajax_url, {action:'opphub_filter', nonce:opphub_ajax.nonce}, function(r){
                 if(r.success){$cards.html(r.data.html);$count.text(r.data.count);}
             });
         }
-        /* Ensure filter form works */
+
+        /* 3. Filter form submit */
         $('#opphub-filter-form').off('submit.opphub').on('submit.opphub', function(e){
             e.preventDefault();
             var data = {action:'opphub_filter', nonce:opphub_ajax.nonce,

@@ -2,14 +2,14 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 2.8.0
+ * Version: 2.9.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
 
 if (!defined('ABSPATH')) exit;
 
-define('OPP_HUB_VERSION', '2.8.0');
+define('OPP_HUB_VERSION', '2.9.0');
 define('OPP_HUB_PATH', plugin_dir_path(__FILE__));
 define('OPP_HUB_URL', plugin_dir_url(__FILE__));
 
@@ -540,6 +540,26 @@ function opphub_ajax_filter() {
     wp_reset_postdata();
 
     wp_send_json_success(['html' => ob_get_clean(), 'count' => $query->found_posts]);
+}
+
+// ============================================================
+// 7B. AJAX FILTER OPTIONS (DYNAMIC DROPDOWNS)
+// ============================================================
+add_action('wp_ajax_opphub_get_options', 'opphub_ajax_get_options');
+add_action('wp_ajax_nopriv_opphub_get_options', 'opphub_ajax_get_options');
+function opphub_ajax_get_options() {
+    $taxonomies = ['institution', 'funding_type', 'region', 'sector'];
+    $options = [];
+    foreach ($taxonomies as $tax) {
+        $terms = get_terms(['taxonomy' => $tax, 'hide_empty' => false, 'orderby' => 'name']);
+        $options[$tax] = [];
+        if ($terms && !is_wp_error($terms)) {
+            foreach ($terms as $term) {
+                $options[$tax][] = ['slug' => $term->slug, 'name' => $term->name];
+            }
+        }
+    }
+    wp_send_json_success($options);
 }
 
 // ============================================================
