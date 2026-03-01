@@ -199,7 +199,7 @@ function opphub_activate() {
     }
 
     // Regions
-    $regions = ['Caribbean', 'Africa', 'Latin America', 'Global', 'Asia Pacific', 'North America', 'Europe'];
+    $regions = ['Caribbean', 'Haiti', 'Africa', 'Latin America', 'Global', 'Asia Pacific', 'North America', 'Europe'];
     foreach ($regions as $region) {
         if (!term_exists($region, 'region')) {
             wp_insert_term($region, 'region');
@@ -666,7 +666,7 @@ function opphub_settings_page() {
         <hr>
         <h2>RSS Auto-Import</h2>
         <p>The plugin automatically imports funding opportunities from global institutions every 12 hours.</p>
-        <p><strong>Sources:</strong> Devex Funding, ReliefWeb (UN), UN News, Green Climate Fund, IDB, Asian Development Bank</p>
+        <p><strong>Sources:</strong> World Bank (JSON API), IDB Caribbean Dev Trends, IDB Ideas Matter, Caribbean Dev Bank, UN News, Green Climate Fund, ReliefWeb, ReliefWeb Haiti, Devex Funding</p>
         <p><strong>Last import:</strong> <?php echo esc_html($last_import); ?> (<?php echo intval($import_count); ?> items imported)</p>
         <form method="post">
             <?php wp_nonce_field('opphub_settings_nonce'); ?>
@@ -695,75 +695,117 @@ add_action('init', 'opphub_maybe_initial_import', 100);
 function opphub_maybe_initial_import() {
     if (get_option('opphub_import_version') !== OPP_HUB_VERSION) {
         update_option('opphub_import_version', OPP_HUB_VERSION);
-        // Re-import on every version update to pick up new feed sources
+
+        // Ensure post type & taxonomies exist
+        opphub_register_post_type();
+
+        // Seed new taxonomy terms
+        $new_institutions = ['IDB', 'World Bank', 'UN', 'USAID'];
+        foreach ($new_institutions as $inst) {
+            if (!term_exists($inst, 'institution')) {
+                wp_insert_term($inst, 'institution');
+            }
+        }
+        $new_regions = ['Haiti', 'Caribbean', 'Latin America', 'Global', 'Africa', 'Asia Pacific', 'North America', 'Europe'];
+        foreach ($new_regions as $r) {
+            if (!term_exists($r, 'region')) {
+                wp_insert_term($r, 'region');
+            }
+        }
+
+        // Tag existing Caribbean opportunities with Haiti too
+        opphub_tag_caribbean_with_haiti();
+
+        // Re-import to pick up new feed sources
         opphub_import_from_feeds();
+    }
+}
+
+/**
+ * Add 'Haiti' region to all existing posts that have 'Caribbean' region.
+ */
+function opphub_tag_caribbean_with_haiti() {
+    $caribbean_posts = get_posts([
+        'post_type'      => 'opportunity',
+        'posts_per_page' => -1,
+        'post_status'    => 'publish',
+        'tax_query'      => [
+            ['taxonomy' => 'region', 'field' => 'slug', 'terms' => 'caribbean'],
+        ],
+        'fields'         => 'ids',
+    ]);
+
+    foreach ($caribbean_posts as $post_id) {
+        wp_set_object_terms($post_id, ['Caribbean', 'Haiti'], 'region');
     }
 }
 
 function opphub_import_from_feeds() {
     include_once(ABSPATH . WPINC . '/feed.php');
 
+    // RSS feeds that SimplePie can parse
     $feeds = [
         [
             'url'         => 'https://www.devex.com/funding/feed',
             'institution' => 'Global',
             'type'        => 'Grant',
-            'region'      => 'Global',
-            'sector'      => 'SME',
-        ],
-        [
-            'url'         => 'https://search.worldbank.org/api/v2/projects?format=atom&rows=10',
-            'institution' => 'World Bank',
-            'type'        => 'Loan',
-            'region'      => 'Global',
-            'sector'      => 'SME',
-        ],
-        [
-            'url'         => 'https://search.worldbank.org/api/v2/news?format=atom&rows=10',
-            'institution' => 'World Bank',
-            'type'        => 'Grant',
-            'region'      => 'Global',
+            'region'      => ['Global'],
             'sector'      => 'SME',
         ],
         [
             'url'         => 'https://www.greenclimate.fund/news/feed',
             'institution' => 'UN',
             'type'        => 'Grant',
-            'region'      => 'Global',
+            'region'      => ['Global'],
             'sector'      => 'Energy',
         ],
         [
             'url'         => 'https://news.un.org/feed/subscribe/en/news/topic/economic-development/feed/rss.xml',
             'institution' => 'UN',
             'type'        => 'Grant',
-            'region'      => 'Global',
+            'region'      => ['Global'],
             'sector'      => 'SME',
         ],
         [
             'url'         => 'https://blogs.iadb.org/ideas-matter/en/feed/',
             'institution' => 'IDB',
             'type'        => 'Grant',
-            'region'      => 'Caribbean',
+            'region'      => ['Caribbean', 'Latin America'],
+            'sector'      => 'SME',
+        ],
+        [
+            'url'         => 'https://blogs.iadb.org/caribbean-dev-trends/en/feed/',
+            'institution' => 'IDB',
+            'type'        => 'Grant',
+            'region'      => ['Caribbean', 'Haiti'],
             'sector'      => 'SME',
         ],
         [
             'url'         => 'https://www.caribank.org/rss.xml',
-            'institution' => 'IDB',
+            'institution' => 'World Bank',
             'type'        => 'Loan',
-            'region'      => 'Caribbean',
+            'region'      => ['Caribbean', 'Haiti'],
             'sector'      => 'SME',
         ],
         [
             'url'         => 'https://reliefweb.int/updates/rss.xml',
             'institution' => 'UN',
             'type'        => 'Grant',
-            'region'      => 'Global',
+            'region'      => ['Global'],
+            'sector'      => 'NGO',
+        ],
+        [
+            'url'         => 'https://reliefweb.int/updates/rss.xml?search=haiti+funding',
+            'institution' => 'UN',
+            'type'        => 'Grant',
+            'region'      => ['Haiti', 'Caribbean'],
             'sector'      => 'NGO',
         ],
     ];
 
     $imported = 0;
 
+    // ---- Part 1: Import from standard RSS feeds ----
     foreach ($feeds as $feed_config) {
         $rss = fetch_feed($feed_config['url']);
 
@@ -776,73 +818,82 @@ function opphub_import_from_feeds() {
 
         foreach ($items as $item) {
             $title = sanitize_text_field($item->get_title());
+            if (empty($title)) continue;
+
             $link  = esc_url_raw($item->get_permalink());
             $desc  = wp_kses_post($item->get_description());
             $date  = $item->get_date('Y-m-d H:i:s');
 
-            // Skip if we already imported this (check by title + source URL)
-            $existing = get_posts([
-                'post_type'   => 'opportunity',
-                'title'       => $title,
-                'post_status' => 'publish',
-                'numberposts' => 1,
-                'meta_query'  => [
-                    [
-                        'key'   => '_opphub_source_url',
-                        'value' => $link,
-                    ],
-                ],
-            ]);
+            if (opphub_post_exists($title, $link)) continue;
 
-            if (!empty($existing)) {
-                continue;
+            $post_id = opphub_create_opportunity($title, $desc, $date, $link, $feed_config);
+            if ($post_id) $imported++;
+        }
+    }
+
+    // ---- Part 2: Import World Bank projects via JSON API ----
+    $wb_apis = [
+        [
+            'url'    => 'https://search.worldbank.org/api/v2/projects?format=json&rows=10&countrycode_exact=HT',
+            'region' => ['Haiti', 'Caribbean'],
+            'type'   => 'Loan',
+        ],
+        [
+            'url'    => 'https://search.worldbank.org/api/v2/projects?format=json&rows=10&regionname_exact=Latin+America+and+Caribbean',
+            'region' => ['Caribbean', 'Latin America'],
+            'type'   => 'Loan',
+        ],
+        [
+            'url'    => 'https://search.worldbank.org/api/v2/projects?format=json&rows=10',
+            'region' => ['Global'],
+            'type'   => 'Loan',
+        ],
+    ];
+
+    foreach ($wb_apis as $api) {
+        $response = wp_remote_get($api['url'], ['timeout' => 15]);
+        if (is_wp_error($response)) continue;
+
+        $body = wp_remote_retrieve_body($response);
+        $data = json_decode($body, true);
+        if (empty($data['projects'])) continue;
+
+        foreach ($data['projects'] as $key => $project) {
+            if (!is_array($project) || empty($project['project_name'])) continue;
+
+            $title = sanitize_text_field($project['project_name']);
+            $link  = esc_url_raw($project['url'] ?? 'https://projects.worldbank.org/en/projects-operations/project-detail/' . $key);
+            $desc  = sprintf(
+                'World Bank project: %s. Country: %s. Total amount: $%s. Status: %s.',
+                $title,
+                $project['countryname'] ?? 'Global',
+                $project['totalamt'] ?? 'N/A',
+                $project['status'] ?? 'Active'
+            );
+            $date  = '';
+            if (!empty($project['boardapprovaldate'])) {
+                $date = date('Y-m-d H:i:s', strtotime($project['boardapprovaldate']));
             }
 
-            // Also check by title alone to avoid near-duplicates
-            $title_exists = get_posts([
-                'post_type'   => 'opportunity',
-                'title'       => $title,
-                'post_status' => 'publish',
-                'numberposts' => 1,
-            ]);
+            if (opphub_post_exists($title, $link)) continue;
 
-            if (!empty($title_exists)) {
-                continue;
+            $feed_config = [
+                'institution' => 'World Bank',
+                'type'        => $api['type'],
+                'region'      => $api['region'],
+                'sector'      => 'SME',
+            ];
+
+            // Determine funding size from totalamt
+            if (!empty($project['totalamt'])) {
+                $amount = (int) str_replace(',', '', $project['totalamt']);
+                if ($amount > 0) {
+                    $feed_config['funding_max'] = $amount;
+                }
             }
 
-            // Create the opportunity post
-            $post_id = wp_insert_post([
-                'post_type'    => 'opportunity',
-                'post_title'   => $title,
-                'post_content' => $desc,
-                'post_excerpt' => wp_trim_words(wp_strip_all_tags($desc), 30),
-                'post_status'  => 'publish',
-                'post_date'    => $date ?: current_time('mysql'),
-            ]);
-
-            if ($post_id && !is_wp_error($post_id)) {
-                // Save source metadata
-                update_post_meta($post_id, '_opphub_source_url', $link);
-                update_post_meta($post_id, '_opphub_apply_url', $link);
-                update_post_meta($post_id, '_opphub_status', 'open');
-                update_post_meta($post_id, '_opphub_imported', true);
-
-                // Assign taxonomy terms
-                if (!empty($feed_config['institution'])) {
-                    wp_set_object_terms($post_id, $feed_config['institution'], 'institution');
-                }
-                if (!empty($feed_config['type'])) {
-                    wp_set_object_terms($post_id, $feed_config['type'], 'funding_type');
-                }
-                if (!empty($feed_config['region'])) {
-                    wp_set_object_terms($post_id, $feed_config['region'], 'region');
-                }
-                if (!empty($feed_config['sector'])) {
-                    wp_set_object_terms($post_id, $feed_config['sector'], 'sector');
-                }
-
-                $imported++;
-            }
+            $post_id = opphub_create_opportunity($title, $desc, $date, $link, $feed_config);
+            if ($post_id) $imported++;
         }
     }
 
@@ -850,6 +901,73 @@ function opphub_import_from_feeds() {
     update_option('opphub_last_import_count', $imported);
 
     return $imported;
+}
+
+/**
+ * Check if an opportunity already exists by title or source URL.
+ */
+function opphub_post_exists($title, $link) {
+    $existing = get_posts([
+        'post_type'   => 'opportunity',
+        'title'       => $title,
+        'post_status' => 'publish',
+        'numberposts' => 1,
+    ]);
+    if (!empty($existing)) return true;
+
+    if (!empty($link)) {
+        $by_url = get_posts([
+            'post_type'   => 'opportunity',
+            'post_status' => 'publish',
+            'numberposts' => 1,
+            'meta_query'  => [['key' => '_opphub_source_url', 'value' => $link]],
+        ]);
+        if (!empty($by_url)) return true;
+    }
+
+    return false;
+}
+
+/**
+ * Create an opportunity post with taxonomy terms and meta.
+ */
+function opphub_create_opportunity($title, $desc, $date, $link, $config) {
+    $post_id = wp_insert_post([
+        'post_type'    => 'opportunity',
+        'post_title'   => $title,
+        'post_content' => $desc,
+        'post_excerpt' => wp_trim_words(wp_strip_all_tags($desc), 30),
+        'post_status'  => 'publish',
+        'post_date'    => $date ?: current_time('mysql'),
+    ]);
+
+    if (!$post_id || is_wp_error($post_id)) return 0;
+
+    update_post_meta($post_id, '_opphub_source_url', $link);
+    update_post_meta($post_id, '_opphub_apply_url', $link);
+    update_post_meta($post_id, '_opphub_status', 'open');
+    update_post_meta($post_id, '_opphub_imported', true);
+
+    if (!empty($config['funding_max'])) {
+        update_post_meta($post_id, '_opphub_funding_max', $config['funding_max']);
+    }
+
+    if (!empty($config['institution'])) {
+        wp_set_object_terms($post_id, $config['institution'], 'institution');
+    }
+    if (!empty($config['type'])) {
+        wp_set_object_terms($post_id, $config['type'], 'funding_type');
+    }
+    if (!empty($config['region'])) {
+        // Support array of regions (e.g., ['Caribbean', 'Haiti'])
+        $regions = is_array($config['region']) ? $config['region'] : [$config['region']];
+        wp_set_object_terms($post_id, $regions, 'region');
+    }
+    if (!empty($config['sector'])) {
+        wp_set_object_terms($post_id, $config['sector'], 'sector');
+    }
+
+    return $post_id;
 }
 
 // Clean up cron on deactivation
