@@ -2,14 +2,14 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 1.4.0
+ * Version: 1.5.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
 
 if (!defined('ABSPATH')) exit;
 
-define('OPP_HUB_VERSION', '1.4.0');
+define('OPP_HUB_VERSION', '1.5.0');
 define('OPP_HUB_PATH', plugin_dir_path(__FILE__));
 define('OPP_HUB_URL', plugin_dir_url(__FILE__));
 
@@ -491,85 +491,90 @@ function opphub_maybe_flush_rewrite() {
 }
 
 // ============================================================
-// 10. CTA BUTTON INJECTED AFTER "START FREE LEARNING" + MOBILE STICKY
+// 10. CTA BUTTON INJECTED AFTER "START FREE LEARNING"
 // ============================================================
-add_action('wp_head', 'opphub_cta_css');
-function opphub_cta_css() {
-    if (is_admin()) return;
-    ?>
-    <style id="opphub-cta-css">
-        #opphub-inline-cta{text-align:center;padding:20px 15px 10px;width:100%;max-width:600px;margin:0 auto}
-        #opphub-inline-cta a{display:inline-block;background:linear-gradient(135deg,#D32F2F,#B71C1C);color:#fff!important;padding:16px 32px;border-radius:50px;font-size:17px;font-weight:700;text-decoration:none!important;box-shadow:0 4px 20px rgba(211,47,47,0.4);transition:all .3s ease;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;line-height:1.4;width:90%;max-width:500px;text-align:center}
-        #opphub-inline-cta a:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(211,47,47,0.5);color:#fff!important}
-        @media(max-width:768px){#opphub-inline-cta a{width:90%;font-size:16px;padding:16px 20px}}
-    </style>
-    <?php
-}
-
 add_action('wp_footer', 'opphub_cta_html', 999);
 function opphub_cta_html() {
     if (is_admin()) return;
     $hub_url = esc_url(home_url('/funding-hub'));
     ?>
+    <style id="opphub-cta-css">
+        #opphub-inline-cta {
+            text-align: center;
+            padding: 30px 20px 40px;
+            width: 100%;
+            background: linear-gradient(135deg, #0d1b4a 0%, #1a237e 100%);
+        }
+        #opphub-inline-cta a {
+            display: inline-block;
+            background: linear-gradient(135deg, #D32F2F, #B71C1C);
+            color: #fff !important;
+            padding: 18px 40px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 700;
+            text-decoration: none !important;
+            box-shadow: 0 4px 20px rgba(211,47,47,0.4);
+            transition: all 0.3s ease;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.4;
+            max-width: 500px;
+            width: 85%;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+        #opphub-inline-cta a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 28px rgba(211,47,47,0.5);
+            background: linear-gradient(135deg, #E53935, #C62828);
+            color: #fff !important;
+        }
+        @media (max-width: 768px) {
+            #opphub-inline-cta { padding: 25px 15px 30px; }
+            #opphub-inline-cta a { width: 90%; font-size: 16px; padding: 16px 24px; }
+        }
+    </style>
     <script>
     (function(){
-        if(document.getElementById('opphub-inline-cta'))return;
-        if(window.location.pathname.indexOf('funding-hub')!==-1)return;
+        if(document.getElementById('opphub-inline-cta')) return;
+        if(window.location.pathname.indexOf('funding-hub') !== -1) return;
 
-        var cta=document.createElement('div');
-        cta.id='opphub-inline-cta';
-        cta.innerHTML='<a href="<?php echo $hub_url; ?>">&#128176; Explore Funding Opportunities</a>';
+        var cta = document.createElement('div');
+        cta.id = 'opphub-inline-cta';
+        cta.innerHTML = '<a href="<?php echo $hub_url; ?>">&#128176; Explore Funding Opportunities</a>';
 
-        // Strategy 1: Find "Choose the application type" and insert BEFORE it
-        var allEls=document.querySelectorAll('h1,h2,h3,h4,h5,h6,p,span,div');
-        var target=null;
-        for(var i=0;i<allEls.length;i++){
-            var txt=(allEls[i].textContent||'').trim().toLowerCase();
-            if(txt.indexOf('choose the application type')!==-1){
-                target=allEls[i].closest('.elementor-widget')||allEls[i].closest('.elementor-element')||allEls[i].closest('.elementor-section')||allEls[i].parentElement;
-                break;
-            }
-        }
-        if(target&&target.parentNode){
-            target.parentNode.insertBefore(cta,target);
+        // Primary: Insert before the "Choose the application type" parent section
+        var chooseSection = document.querySelector('[data-id="de4e74e"]');
+        if (chooseSection && chooseSection.parentNode) {
+            chooseSection.parentNode.insertBefore(cta, chooseSection);
             return;
         }
 
-        // Strategy 2: Find "Start Free Learning" image/link
-        var imgs=document.querySelectorAll('img,a');
-        for(var j=0;j<imgs.length;j++){
-            var src=(imgs[j].src||imgs[j].href||'').toLowerCase();
-            var alt=(imgs[j].alt||imgs[j].textContent||'').toLowerCase();
-            if(alt.indexOf('start free learning')!==-1||alt.indexOf('free learning')!==-1){
-                target=imgs[j].closest('.elementor-widget')||imgs[j].closest('.elementor-element')||imgs[j].parentElement;
-                if(target&&target.parentNode){
-                    target.parentNode.insertBefore(cta,target.nextSibling);
+        // Fallback 1: Find the link to /affiliate-learn/ (Start Free Learning image)
+        // and insert after its top-level parent section
+        var learnLink = document.querySelector('a[href*="affiliate-learn"]');
+        if (learnLink) {
+            var parentSection = learnLink.closest('.e-con.e-parent') || learnLink.closest('[data-element_type="container"].e-parent');
+            if (parentSection && parentSection.parentNode) {
+                parentSection.parentNode.insertBefore(cta, parentSection.nextSibling);
+                return;
+            }
+        }
+
+        // Fallback 2: Find "Choose the application type" text and go up to top-level parent
+        var allEls = document.querySelectorAll('p, span, div');
+        for (var i = 0; i < allEls.length; i++) {
+            var txt = (allEls[i].textContent || '').trim().toLowerCase();
+            if (txt.indexOf('choose the application type') !== -1) {
+                var topParent = allEls[i].closest('.e-con.e-parent') || allEls[i].closest('[data-element_type="container"].e-parent');
+                if (topParent && topParent.parentNode) {
+                    topParent.parentNode.insertBefore(cta, topParent);
                     return;
                 }
             }
         }
 
-        // Strategy 3: Find "How do I get paid?" section and insert after it
-        for(var k=0;k<allEls.length;k++){
-            var t2=(allEls[k].textContent||'').trim().toLowerCase();
-            if(t2==='how do i get paid?'){
-                var sec=allEls[k].closest('.elementor-section')||allEls[k].closest('.elementor-element')||allEls[k].parentElement;
-                if(sec&&sec.parentNode){
-                    // Go up to find a sibling that's 2-3 siblings after (past Start Free Learning)
-                    var sib=sec.nextElementSibling;
-                    if(sib)sib=sib.nextElementSibling;
-                    if(sib){
-                        sib.parentNode.insertBefore(cta,sib);
-                        return;
-                    }
-                }
-            }
-        }
-
-        // Final fallback: append to body as floating
-        cta.style.cssText='position:fixed;bottom:0;left:0;right:0;z-index:999999;padding:0';
-        cta.querySelector('a').style.cssText+='display:block;border-radius:0;width:100%';
-        document.body.appendChild(cta);
+        // Final fallback: do not show (don't show a broken floating bar)
     })();
     </script>
     <?php
