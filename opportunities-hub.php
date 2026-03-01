@@ -2,14 +2,14 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 2.7.0
+ * Version: 2.8.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
 
 if (!defined('ABSPATH')) exit;
 
-define('OPP_HUB_VERSION', '2.7.0');
+define('OPP_HUB_VERSION', '2.8.0');
 define('OPP_HUB_PATH', plugin_dir_path(__FILE__));
 define('OPP_HUB_URL', plugin_dir_url(__FILE__));
 
@@ -491,7 +491,23 @@ function opphub_ajax_filter() {
         if ($query->found_posts > 0) $args = $try_args;
     }
 
-    // Fallback 3: if institution + region both set and still 0, try just institution
+    // Fallback 3: if Haiti region selected, also search by keyword in content
+    $region_slug = !empty($_POST['region']) ? sanitize_text_field($_POST['region']) : '';
+    if ($query->found_posts === 0 && $region_slug === 'haiti') {
+        $try_args = [
+            'post_type' => 'opportunity', 'posts_per_page' => 50,
+            'orderby' => 'date', 'order' => 'DESC',
+            's' => 'haiti',
+        ];
+        // Keep institution filter if set
+        if (!empty($_POST['institution'])) {
+            $try_args['tax_query'] = [['taxonomy' => 'institution', 'field' => 'slug', 'terms' => sanitize_text_field($_POST['institution'])]];
+        }
+        $query = new WP_Query($try_args);
+        if ($query->found_posts > 0) $args = $try_args;
+    }
+
+    // Fallback 4: if institution + region both set and still 0, try just institution
     if ($query->found_posts === 0 && !empty($_POST['institution']) && !empty($_POST['region'])) {
         $try_args = [
             'post_type' => 'opportunity', 'posts_per_page' => 50,
@@ -502,12 +518,12 @@ function opphub_ajax_filter() {
         if ($query->found_posts > 0) $args = $try_args;
     }
 
-    // Fallback 4: if region set and still 0, try just region
+    // Fallback 5: if region set and still 0, try just region
     if ($query->found_posts === 0 && !empty($_POST['region'])) {
         $try_args = [
             'post_type' => 'opportunity', 'posts_per_page' => 50,
             'orderby' => 'date', 'order' => 'DESC',
-            'tax_query' => [['taxonomy' => 'region', 'field' => 'slug', 'terms' => sanitize_text_field($_POST['region'])]],
+            'tax_query' => [['taxonomy' => 'region', 'field' => 'slug', 'terms' => $region_slug]],
         ];
         $query = new WP_Query($try_args);
     }
@@ -698,9 +714,10 @@ function opphub_settings_page() {
     // Handle manual import trigger
     if (isset($_POST['opphub_import_now']) && check_admin_referer('opphub_settings_nonce')) {
         opphub_fix_haiti_tags();
+        opphub_auto_tag_haiti();
         opphub_seed_haiti_opportunities();
         $count = opphub_import_from_feeds();
-        echo '<div class="notice notice-success"><p>Import complete! ' . intval($count) . ' new opportunities imported. Haiti projects seeded.</p></div>';
+        echo '<div class="notice notice-success"><p>Import complete! ' . intval($count) . ' new opportunities imported. Haiti projects seeded and auto-tagged.</p></div>';
     }
 
     if (isset($_POST['opphub_save_settings']) && check_admin_referer('opphub_settings_nonce')) {
@@ -783,6 +800,9 @@ function opphub_maybe_initial_import() {
 
         // Fix: remove Haiti tag from posts that aren't genuinely about Haiti
         opphub_fix_haiti_tags();
+
+        // Auto-tag posts that mention Haiti in their content
+        opphub_auto_tag_haiti();
 
         // Seed Haiti opportunities from World Bank (hardcoded, no API dependency)
         opphub_seed_haiti_opportunities();
@@ -981,6 +1001,33 @@ function opphub_fix_haiti_tags() {
             $new_regions = array_filter($current_regions, function($r) { return $r !== 'Haiti'; });
             if (empty($new_regions)) $new_regions = ['Caribbean'];
             wp_set_object_terms($post_id, $new_regions, 'region');
+        }
+    }
+}
+
+/**
+ * Auto-tag existing posts that mention Haiti in title/content with the Haiti region.
+ */
+function opphub_auto_tag_haiti() {
+    // Get all opportunity posts that DON'T have Haiti tag
+    $all_posts = get_posts([
+        'post_type'      => 'opportunity',
+        'posts_per_page' => -1,
+        'post_status'    => 'publish',
+        'fields'         => 'ids',
+    ]);
+
+    foreach ($all_posts as $post_id) {
+        // Check if already tagged with Haiti
+        $current_regions = wp_get_object_terms($post_id, 'region', ['fields' => 'names']);
+        if (in_array('Haiti', $current_regions)) continue;
+
+        $title   = strtolower(get_the_title($post_id));
+        $content = strtolower(get_post_field('post_content', $post_id));
+
+        if (strpos($title, 'haiti') !== false || strpos($content, 'haiti') !== false) {
+            $current_regions[] = 'Haiti';
+            wp_set_object_terms($post_id, $current_regions, 'region');
         }
     }
 }
@@ -1206,6 +1253,13 @@ function opphub_create_opportunity($title, $desc, $date, $link, $config) {
     if (!empty($config['region'])) {
         // Support array of regions (e.g., ['Caribbean', 'Haiti'])
         $regions = is_array($config['region']) ? $config['region'] : [$config['region']];
+
+        // Auto-detect Haiti: if title or content mentions "haiti", add Haiti region
+        $check_text = strtolower($title . ' ' . $desc);
+        if (stripos($check_text, 'haiti') !== false && !in_array('Haiti', $regions)) {
+            $regions[] = 'Haiti';
+        }
+
         wp_set_object_terms($post_id, $regions, 'region');
     }
     if (!empty($config['sector'])) {
