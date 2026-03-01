@@ -178,7 +178,7 @@
 
 .opphub-cards-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr));
     gap: 24px;
 }
 
@@ -461,60 +461,24 @@ a.opphub-logo-text:hover {
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
+    #opphub-landing {
+        overflow-x: hidden;
+    }
+
+    .opphub-container {
+        padding: 0 15px;
+    }
+
     .opphub-hero {
-        padding: 48px 0 36px;
+        padding: 40px 0 30px;
     }
 
     .opphub-hero-title {
-        font-size: 26px;
+        font-size: 24px;
     }
 
     .opphub-hero-subtitle {
-        font-size: 15px;
-    }
-
-    .opphub-filter-bar {
-        position: relative;
-        top: auto;
-    }
-
-    .opphub-filters {
-        flex-direction: column;
-    }
-
-    .opphub-filter-group select {
-        min-width: 100%;
-    }
-
-    .opphub-cards-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .opphub-why-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .opphub-package-box {
-        padding: 32px 24px;
-    }
-
-    .opphub-package-box h2 {
-        font-size: 22px;
-    }
-
-    .opphub-logos {
-        gap: 16px;
-    }
-
-    .opphub-logo-text {
-        font-size: 12px;
-        padding: 8px 12px;
-    }
-}
-
-@media (max-width: 480px) {
-    .opphub-hero-title {
-        font-size: 22px;
+        font-size: 14px;
     }
 
     .opphub-hero-cta {
@@ -525,11 +489,115 @@ a.opphub-logo-text:hover {
         width: 100%;
     }
 
+    /* Filter bar: NOT sticky on mobile */
+    .opphub-filter-bar {
+        position: relative;
+        top: auto;
+        z-index: auto;
+        padding: 20px 0;
+    }
+
+    .opphub-filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .opphub-filter-group {
+        width: 100%;
+    }
+
+    .opphub-filter-group select {
+        width: 100%;
+        min-width: 100%;
+        padding: 12px 14px;
+        font-size: 15px;
+    }
+
+    .opphub-filter-group:last-child {
+        flex-direction: row;
+        width: 100%;
+    }
+
+    .opphub-filter-group:last-child .opphub-btn {
+        flex: 1;
+    }
+
+    /* Cards: single column, no overflow */
+    .opphub-opportunities {
+        padding: 30px 0;
+    }
+
+    .opphub-cards-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .opphub-card {
+        padding: 18px;
+        overflow: hidden;
+        word-wrap: break-word;
+    }
+
+    .opphub-card-title {
+        font-size: 16px;
+    }
+
+    .opphub-card-desc {
+        font-size: 13px;
+    }
+
     .opphub-card-actions {
         flex-direction: column;
     }
 
     .opphub-card-actions .opphub-btn {
         width: 100%;
+        text-align: center;
+    }
+
+    .opphub-why {
+        padding: 40px 0;
+    }
+
+    .opphub-why h2 {
+        font-size: 24px;
+    }
+
+    .opphub-why-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .opphub-cta-package {
+        padding: 40px 0;
+    }
+
+    .opphub-package-box {
+        padding: 28px 20px;
+    }
+
+    .opphub-package-box h2 {
+        font-size: 22px;
+    }
+
+    .opphub-rss-section {
+        padding: 40px 0;
+    }
+
+    .opphub-rss-section h2 {
+        font-size: 22px;
+    }
+
+    .opphub-partners {
+        padding: 30px 0;
+    }
+
+    .opphub-logos {
+        gap: 12px;
+        justify-content: center;
+    }
+
+    .opphub-logo-text {
+        font-size: 12px;
+        padding: 8px 12px;
     }
 }
