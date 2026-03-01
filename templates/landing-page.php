@@ -149,8 +149,8 @@ $sectors       = get_terms(['taxonomy' => 'sector', 'hide_empty' => false]);
         <div class="opphub-container">
             <h2>Latest Funding Updates</h2>
             <p>Auto-updated feed pulling from IDB, World Bank, UN Agencies, Chambers of Commerce, and Microfinance Institutions.</p>
-            <a href="<?php echo esc_url(home_url('/?feed=opportunities-feed')); ?>" class="opphub-btn opphub-btn-blue" target="_blank">
-                &#128266; Subscribe to Updates (RSS)
+            <a href="#opphub-opportunities" class="opphub-btn opphub-btn-blue" onclick="document.getElementById('opphub-opportunities').scrollIntoView({behavior:'smooth'});return false;">
+                &#128266; View Latest Updates
             </a>
         </div>
     </section>
