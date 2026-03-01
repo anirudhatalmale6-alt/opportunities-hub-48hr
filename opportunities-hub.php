@@ -2,14 +2,14 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 1.1.0
+ * Version: 1.2.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
 
 if (!defined('ABSPATH')) exit;
 
-define('OPP_HUB_VERSION', '1.1.0');
+define('OPP_HUB_VERSION', '1.2.0');
 define('OPP_HUB_PATH', plugin_dir_path(__FILE__));
 define('OPP_HUB_URL', plugin_dir_url(__FILE__));
 
@@ -491,60 +491,35 @@ function opphub_maybe_flush_rewrite() {
 }
 
 // ============================================================
-// 10. FLOATING CTA BUTTON ON ALL PAGES (MOBILE + DESKTOP)
+// 10. FLOATING CTA BUTTON ON ALL PAGES (JS INJECTION)
 // ============================================================
-add_action('wp_footer', 'opphub_floating_cta');
-function opphub_floating_cta() {
-    // Don't show on the funding hub page itself or in admin
+add_action('wp_head', 'opphub_floating_cta_css');
+function opphub_floating_cta_css() {
     if (is_admin()) return;
-    if (is_page('funding-hub') || (is_page() && get_page_template_slug() === 'opphub-landing.php')) return;
     ?>
-    <div id="opphub-floating-cta">
-        <a href="<?php echo esc_url(home_url('/funding-hub')); ?>">
-            &#128176; Explore Funding Opportunities
-        </a>
-    </div>
-    <style>
-        #opphub-floating-cta {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 9999;
-        }
-        #opphub-floating-cta a {
-            display: inline-block;
-            background: linear-gradient(135deg, #D32F2F, #B71C1C);
-            color: #fff !important;
-            padding: 14px 24px;
-            border-radius: 50px;
-            font-size: 15px;
-            font-weight: 700;
-            text-decoration: none !important;
-            box-shadow: 0 4px 20px rgba(211, 47, 47, 0.4);
-            transition: all 0.3s ease;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-        #opphub-floating-cta a:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 28px rgba(211, 47, 47, 0.5);
-            color: #fff !important;
-        }
-        @media (max-width: 768px) {
-            #opphub-floating-cta {
-                bottom: 0;
-                left: 0;
-                right: 0;
-                padding: 0;
-            }
-            #opphub-floating-cta a {
-                display: block;
-                text-align: center;
-                border-radius: 0;
-                padding: 16px 20px;
-                font-size: 16px;
-            }
-        }
+    <style id="opphub-floating-cta-css">
+        #opphub-floating-cta{position:fixed;bottom:20px;right:20px;z-index:999999}
+        #opphub-floating-cta a{display:inline-block;background:linear-gradient(135deg,#D32F2F,#B71C1C);color:#fff!important;padding:14px 24px;border-radius:50px;font-size:15px;font-weight:700;text-decoration:none!important;box-shadow:0 4px 20px rgba(211,47,47,0.4);transition:all .3s ease;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;line-height:1.4}
+        #opphub-floating-cta a:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(211,47,47,0.5);color:#fff!important}
+        @media(max-width:768px){#opphub-floating-cta{bottom:0;left:0;right:0;padding:0}#opphub-floating-cta a{display:block;text-align:center;border-radius:0;padding:16px 20px;font-size:16px}}
     </style>
+    <?php
+}
+
+add_action('wp_footer', 'opphub_floating_cta_html', 999);
+function opphub_floating_cta_html() {
+    if (is_admin()) return;
+    $hub_url = esc_url(home_url('/funding-hub'));
+    ?>
+    <script>
+    (function(){
+        if(document.getElementById('opphub-floating-cta'))return;
+        if(window.location.pathname.indexOf('funding-hub')!==-1)return;
+        var d=document.createElement('div');d.id='opphub-floating-cta';
+        d.innerHTML='<a href="<?php echo $hub_url; ?>">&#128176; Explore Funding Opportunities</a>';
+        document.body.appendChild(d);
+    })();
+    </script>
     <?php
 }
 
@@ -564,11 +539,20 @@ function opphub_settings_menu() {
 }
 
 function opphub_settings_page() {
+    // Handle manual import trigger
+    if (isset($_POST['opphub_import_now']) && check_admin_referer('opphub_settings_nonce')) {
+        $count = opphub_import_from_feeds();
+        echo '<div class="notice notice-success"><p>Import complete! ' . intval($count) . ' new opportunities imported.</p></div>';
+    }
+
     if (isset($_POST['opphub_save_settings']) && check_admin_referer('opphub_settings_nonce')) {
         update_option('opphub_structured_url', esc_url_raw($_POST['opphub_structured_url']));
         echo '<div class="notice notice-success"><p>Settings saved!</p></div>';
     }
+
     $structured_url = get_option('opphub_structured_url', '');
+    $last_import = get_option('opphub_last_import', 'Never');
+    $import_count = get_option('opphub_last_import_count', 0);
     ?>
     <div class="wrap">
         <h1>Opportunities Hub Settings</h1>
@@ -585,6 +569,187 @@ function opphub_settings_page() {
             </table>
             <input type="submit" name="opphub_save_settings" class="button button-primary" value="Save Settings">
         </form>
+
+        <hr>
+        <h2>RSS Auto-Import</h2>
+        <p>The plugin automatically imports funding opportunities from global institutions every 12 hours.</p>
+        <p><strong>Sources:</strong> Devex Funding, ReliefWeb (UN), UN News, Green Climate Fund, IDB, Asian Development Bank</p>
+        <p><strong>Last import:</strong> <?php echo esc_html($last_import); ?> (<?php echo intval($import_count); ?> items imported)</p>
+        <form method="post">
+            <?php wp_nonce_field('opphub_settings_nonce'); ?>
+            <input type="submit" name="opphub_import_now" class="button button-secondary" value="Import Now">
+        </form>
     </div>
     <?php
+}
+
+// ============================================================
+// 12. RSS AUTO-IMPORT FROM EXTERNAL FEEDS
+// ============================================================
+
+// Schedule the cron event
+add_action('init', 'opphub_schedule_import');
+function opphub_schedule_import() {
+    if (!wp_next_scheduled('opphub_cron_import')) {
+        wp_schedule_event(time(), 'twicedaily', 'opphub_cron_import');
+    }
+}
+
+add_action('opphub_cron_import', 'opphub_import_from_feeds');
+
+// Run import on plugin activation and version update
+add_action('init', 'opphub_maybe_initial_import', 100);
+function opphub_maybe_initial_import() {
+    if (get_option('opphub_import_version') !== OPP_HUB_VERSION) {
+        update_option('opphub_import_version', OPP_HUB_VERSION);
+        // Run initial import in a non-blocking way
+        if (!get_option('opphub_first_import_done')) {
+            opphub_import_from_feeds();
+            update_option('opphub_first_import_done', true);
+        }
+    }
+}
+
+function opphub_import_from_feeds() {
+    include_once(ABSPATH . WPINC . '/feed.php');
+
+    $feeds = [
+        [
+            'url'         => 'https://www.devex.com/funding/feed',
+            'institution' => 'Global',
+            'type'        => 'Grant',
+            'region'      => 'Global',
+            'sector'      => '',
+        ],
+        [
+            'url'         => 'https://reliefweb.int/updates/rss.xml',
+            'institution' => 'UN',
+            'type'        => 'Grant',
+            'region'      => 'Global',
+            'sector'      => 'NGO',
+        ],
+        [
+            'url'         => 'https://news.un.org/feed/subscribe/en/news/topic/economic-development/feed/rss.xml',
+            'institution' => 'UN',
+            'type'        => 'Grant',
+            'region'      => 'Global',
+            'sector'      => 'SME',
+        ],
+        [
+            'url'         => 'https://www.greenclimate.fund/news/feed',
+            'institution' => 'UN',
+            'type'        => 'Grant',
+            'region'      => 'Global',
+            'sector'      => 'Energy',
+        ],
+        [
+            'url'         => 'https://blogs.iadb.org/ideas-matter/en/feed/',
+            'institution' => 'IDB',
+            'type'        => 'Grant',
+            'region'      => 'Caribbean',
+            'sector'      => 'SME',
+        ],
+        [
+            'url'         => 'https://www.adb.org/rss.xml',
+            'institution' => 'World Bank',
+            'type'        => 'Loan',
+            'region'      => 'Asia Pacific',
+            'sector'      => 'SME',
+        ],
+    ];
+
+    $imported = 0;
+
+    foreach ($feeds as $feed_config) {
+        $rss = fetch_feed($feed_config['url']);
+
+        if (is_wp_error($rss)) {
+            continue;
+        }
+
+        $max_items = $rss->get_item_quantity(10);
+        $items = $rss->get_items(0, $max_items);
+
+        foreach ($items as $item) {
+            $title = sanitize_text_field($item->get_title());
+            $link  = esc_url_raw($item->get_permalink());
+            $desc  = wp_kses_post($item->get_description());
+            $date  = $item->get_date('Y-m-d H:i:s');
+
+            // Skip if we already imported this (check by title + source URL)
+            $existing = get_posts([
+                'post_type'   => 'opportunity',
+                'title'       => $title,
+                'post_status' => 'publish',
+                'numberposts' => 1,
+                'meta_query'  => [
+                    [
+                        'key'   => '_opphub_source_url',
+                        'value' => $link,
+                    ],
+                ],
+            ]);
+
+            if (!empty($existing)) {
+                continue;
+            }
+
+            // Also check by title alone to avoid near-duplicates
+            $title_exists = get_posts([
+                'post_type'   => 'opportunity',
+                'title'       => $title,
+                'post_status' => 'publish',
+                'numberposts' => 1,
+            ]);
+
+            if (!empty($title_exists)) {
+                continue;
+            }
+
+            // Create the opportunity post
+            $post_id = wp_insert_post([
+                'post_type'    => 'opportunity',
+                'post_title'   => $title,
+                'post_content' => $desc,
+                'post_excerpt' => wp_trim_words(wp_strip_all_tags($desc), 30),
+                'post_status'  => 'publish',
+                'post_date'    => $date ?: current_time('mysql'),
+            ]);
+
+            if ($post_id && !is_wp_error($post_id)) {
+                // Save source metadata
+                update_post_meta($post_id, '_opphub_source_url', $link);
+                update_post_meta($post_id, '_opphub_apply_url', $link);
+                update_post_meta($post_id, '_opphub_status', 'open');
+                update_post_meta($post_id, '_opphub_imported', true);
+
+                // Assign taxonomy terms
+                if (!empty($feed_config['institution'])) {
+                    wp_set_object_terms($post_id, $feed_config['institution'], 'institution');
+                }
+                if (!empty($feed_config['type'])) {
+                    wp_set_object_terms($post_id, $feed_config['type'], 'funding_type');
+                }
+                if (!empty($feed_config['region'])) {
+                    wp_set_object_terms($post_id, $feed_config['region'], 'region');
+                }
+                if (!empty($feed_config['sector'])) {
+                    wp_set_object_terms($post_id, $feed_config['sector'], 'sector');
+                }
+
+                $imported++;
+            }
+        }
+    }
+
+    update_option('opphub_last_import', current_time('F j, Y g:i A'));
+    update_option('opphub_last_import_count', $imported);
+
+    return $imported;
+}
+
+// Clean up cron on deactivation
+register_deactivation_hook(__FILE__, 'opphub_clear_cron');
+function opphub_clear_cron() {
+    wp_clear_scheduled_hook('opphub_cron_import');
 }
