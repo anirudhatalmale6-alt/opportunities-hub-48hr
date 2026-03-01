@@ -1,5 +1,5 @@
 /**
- * 48HoursReady Opportunities Hub — Filter & AJAX
+ * 48HoursReady Opportunities Hub — Filter & AJAX (v2.9)
  */
 (function($) {
     'use strict';
@@ -9,13 +9,38 @@
     var $count    = $('#opphub-count');
     var $clear    = $('#opphub-clear-filters');
 
-    // Submit filter form via AJAX
+    // 1. Dynamically populate filter dropdowns via AJAX (bypasses Cloudflare HTML cache)
+    if (typeof opphub_ajax !== 'undefined') {
+        $.post(opphub_ajax.ajax_url, {action: 'opphub_get_options'}, function(r) {
+            if (!r.success) return;
+            var opts = r.data;
+            var map = {
+                institution: '#filter-institution',
+                funding_type: '#filter-funding-type',
+                region: '#filter-region',
+                sector: '#filter-sector'
+            };
+            for (var tax in map) {
+                var $sel = $(map[tax]);
+                if (!$sel.length || !opts[tax]) continue;
+                var cur = $sel.val();
+                var firstText = $sel.find('option:first').text();
+                $sel.empty().append('<option value="">' + firstText + '</option>');
+                for (var i = 0; i < opts[tax].length; i++) {
+                    $sel.append('<option value="' + opts[tax][i].slug + '">' + opts[tax][i].name + '</option>');
+                }
+                if (cur) $sel.val(cur);
+            }
+        });
+    }
+
+    // 2. Submit filter form via AJAX
     $form.on('submit', function(e) {
         e.preventDefault();
         applyFilters(true);
     });
 
-    // Clear all filters
+    // 3. Clear all filters
     $clear.on('click', function() {
         $form.find('select').val('');
         applyFilters();
@@ -60,7 +85,7 @@
         }, 500);
     });
 
-    // Auto-load opportunities on page load (bypasses Cloudflare page cache)
+    // 4. Auto-load opportunities on page load (bypasses Cloudflare page cache)
     applyFilters();
 
 })(jQuery);
