@@ -5,6 +5,12 @@
  */
 get_header();
 
+// Get configurable CTA URL
+$structured_url = get_option('opphub_structured_url', '');
+if (empty($structured_url)) {
+    $structured_url = home_url('/');
+}
+
 // Gather taxonomy terms for filters
 $institutions  = get_terms(['taxonomy' => 'institution', 'hide_empty' => false]);
 $funding_types = get_terms(['taxonomy' => 'funding_type', 'hide_empty' => false]);
@@ -29,7 +35,7 @@ $opportunities = new WP_Query([
             <p class="opphub-hero-subtitle">Grants, loans, sponsorships, and programs from IDB, World Bank, UN, banks, and microfinance institutions &mdash; updated weekly.</p>
             <div class="opphub-hero-cta">
                 <a href="#opphub-opportunities" class="opphub-btn opphub-btn-red">Explore Opportunities</a>
-                <a href="https://48hoursready.com/get-structured" class="opphub-btn opphub-btn-blue">Get Structured in 48 Hours</a>
+                <a href="<?php echo esc_url($structured_url); ?>" class="opphub-btn opphub-btn-blue">Get Structured in 48 Hours</a>
             </div>
         </div>
     </section>
@@ -149,7 +155,7 @@ $opportunities = new WP_Query([
                     <li>&#10004; Pitch deck (GPT-verified)</li>
                     <li>&#10004; Bank &amp; institution-ready</li>
                 </ul>
-                <a href="https://48hoursready.com/get-structured" class="opphub-btn opphub-btn-red opphub-btn-lg">Get Ready for $199</a>
+                <a href="<?php echo esc_url($structured_url); ?>" class="opphub-btn opphub-btn-red opphub-btn-lg">Get Ready for $199</a>
             </div>
         </div>
     </section>
@@ -159,7 +165,7 @@ $opportunities = new WP_Query([
         <div class="opphub-container">
             <h2>Latest Funding Updates</h2>
             <p>Auto-updated feed pulling from IDB, World Bank, UN Agencies, Chambers of Commerce, and Microfinance Institutions.</p>
-            <a href="<?php echo esc_url(home_url('/feed/opportunities-feed')); ?>" class="opphub-btn opphub-btn-blue" target="_blank">
+            <a href="<?php echo esc_url(home_url('/?feed=opportunities-feed')); ?>" class="opphub-btn opphub-btn-blue" target="_blank">
                 &#128266; Subscribe to Updates (RSS)
             </a>
         </div>

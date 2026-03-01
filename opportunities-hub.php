@@ -2,14 +2,14 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 1.0.0
+ * Version: 1.1.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
 
 if (!defined('ABSPATH')) exit;
 
-define('OPP_HUB_VERSION', '1.0.0');
+define('OPP_HUB_VERSION', '1.1.0');
 define('OPP_HUB_PATH', plugin_dir_path(__FILE__));
 define('OPP_HUB_URL', plugin_dir_url(__FILE__));
 
@@ -477,4 +477,114 @@ function opphub_admin_column_content($column, $post_id) {
             echo esc_html($labels[$s] ?? $s);
             break;
     }
+}
+
+// ============================================================
+// 9. AUTO-FLUSH PERMALINKS ON UPDATE
+// ============================================================
+add_action('init', 'opphub_maybe_flush_rewrite', 99);
+function opphub_maybe_flush_rewrite() {
+    if (get_option('opphub_flush_version') !== OPP_HUB_VERSION) {
+        flush_rewrite_rules();
+        update_option('opphub_flush_version', OPP_HUB_VERSION);
+    }
+}
+
+// ============================================================
+// 10. FLOATING CTA BUTTON ON ALL PAGES (MOBILE + DESKTOP)
+// ============================================================
+add_action('wp_footer', 'opphub_floating_cta');
+function opphub_floating_cta() {
+    // Don't show on the funding hub page itself or in admin
+    if (is_admin()) return;
+    if (is_page('funding-hub') || (is_page() && get_page_template_slug() === 'opphub-landing.php')) return;
+    ?>
+    <div id="opphub-floating-cta">
+        <a href="<?php echo esc_url(home_url('/funding-hub')); ?>">
+            &#128176; Explore Funding Opportunities
+        </a>
+    </div>
+    <style>
+        #opphub-floating-cta {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+        #opphub-floating-cta a {
+            display: inline-block;
+            background: linear-gradient(135deg, #D32F2F, #B71C1C);
+            color: #fff !important;
+            padding: 14px 24px;
+            border-radius: 50px;
+            font-size: 15px;
+            font-weight: 700;
+            text-decoration: none !important;
+            box-shadow: 0 4px 20px rgba(211, 47, 47, 0.4);
+            transition: all 0.3s ease;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        #opphub-floating-cta a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 28px rgba(211, 47, 47, 0.5);
+            color: #fff !important;
+        }
+        @media (max-width: 768px) {
+            #opphub-floating-cta {
+                bottom: 0;
+                left: 0;
+                right: 0;
+                padding: 0;
+            }
+            #opphub-floating-cta a {
+                display: block;
+                text-align: center;
+                border-radius: 0;
+                padding: 16px 20px;
+                font-size: 16px;
+            }
+        }
+    </style>
+    <?php
+}
+
+// ============================================================
+// 11. SETTINGS PAGE FOR CTA LINKS
+// ============================================================
+add_action('admin_menu', 'opphub_settings_menu');
+function opphub_settings_menu() {
+    add_submenu_page(
+        'edit.php?post_type=opportunity',
+        'Hub Settings',
+        'Settings',
+        'manage_options',
+        'opphub-settings',
+        'opphub_settings_page'
+    );
+}
+
+function opphub_settings_page() {
+    if (isset($_POST['opphub_save_settings']) && check_admin_referer('opphub_settings_nonce')) {
+        update_option('opphub_structured_url', esc_url_raw($_POST['opphub_structured_url']));
+        echo '<div class="notice notice-success"><p>Settings saved!</p></div>';
+    }
+    $structured_url = get_option('opphub_structured_url', '');
+    ?>
+    <div class="wrap">
+        <h1>Opportunities Hub Settings</h1>
+        <form method="post">
+            <?php wp_nonce_field('opphub_settings_nonce'); ?>
+            <table class="form-table">
+                <tr>
+                    <th><label for="opphub_structured_url">"Get Structured" CTA URL</label></th>
+                    <td>
+                        <input type="url" id="opphub_structured_url" name="opphub_structured_url" value="<?php echo esc_url($structured_url); ?>" class="regular-text" placeholder="https://48hoursready.com/your-page">
+                        <p class="description">The URL for the "Get Structured in 48 Hours" and "Get Ready for $199" buttons on the Funding Hub page.</p>
+                    </td>
+                </tr>
+            </table>
+            <input type="submit" name="opphub_save_settings" class="button button-primary" value="Save Settings">
+        </form>
+    </div>
+    <?php
 }
