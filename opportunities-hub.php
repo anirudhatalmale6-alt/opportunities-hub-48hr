@@ -2,14 +2,14 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 2.9.0
+ * Version: 3.0.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
 
 if (!defined('ABSPATH')) exit;
 
-define('OPP_HUB_VERSION', '2.9.0');
+define('OPP_HUB_VERSION', '3.0.0');
 define('OPP_HUB_PATH', plugin_dir_path(__FILE__));
 define('OPP_HUB_URL', plugin_dir_url(__FILE__));
 
@@ -983,6 +983,194 @@ function opphub_seed_haiti_opportunities() {
             current_time('mysql'),
             $project['url'],
             $config
+        );
+    }
+
+    // ---- IDB Haiti Projects ----
+    $idb_haiti = [
+        [
+            'title'  => 'IDB Community-based Program to Foster Human Security in Haiti',
+            'url'    => 'https://www.iadb.org/en/project/HA-J0008',
+            'amount' => 25000000,
+            'sector' => 'NGO',
+            'type'   => 'Grant',
+            'desc'   => 'IDB nonreimbursable financing to address human security needs in Haiti, supporting community-based programs for safety and resilience. Approved: $25,000,000.',
+        ],
+        [
+            'title'  => 'IDB Support to Haiti Education Governance (SHEG)',
+            'url'    => 'https://www.iadb.org/en/project/HA-J0009',
+            'amount' => 20000000,
+            'sector' => 'Education',
+            'type'   => 'Grant',
+            'desc'   => 'IDB project supporting education governance and school improvement in Haiti. Approved amount: $20,000,000. Status: Active.',
+        ],
+        [
+            'title'  => 'IDB Digital Opportunities in Haiti through AI (ProAI)',
+            'url'    => 'https://www.iadb.org/en/project/HA-T1339',
+            'amount' => 300000,
+            'sector' => 'Tech',
+            'type'   => 'Grant',
+            'desc'   => 'IDB program to create digital opportunities in Haiti through artificial intelligence. Technical cooperation: $300,000. Approved June 2025.',
+        ],
+        [
+            'title'  => 'IDB Strengthening Social Protection Coordination in Haiti',
+            'url'    => 'https://www.iadb.org/en/project/HA-T1329',
+            'amount' => 350000,
+            'sector' => 'NGO',
+            'type'   => 'Grant',
+            'desc'   => 'IDB project to strengthen social protection coordination systems in Haiti. Technical cooperation: $350,000. Approved November 2024.',
+        ],
+        [
+            'title'  => 'IDB Haiti Impact Facility',
+            'url'    => 'https://www.iadb.org/en/project/HA-T1295',
+            'amount' => 5000000,
+            'sector' => 'SME',
+            'type'   => 'Grant',
+            'desc'   => 'The Haiti Impact Facility (HIF) supports innovative solutions for private sector development and job creation in Haiti. IDB Technical Cooperation.',
+        ],
+        [
+            'title'  => 'IDB Developing Insurance Solutions for Haiti',
+            'url'    => 'https://www.iadb.org/en/project/HA-L1072',
+            'amount' => 2000000,
+            'sector' => 'SME',
+            'type'   => 'Loan',
+            'desc'   => 'IDB project to develop accessible insurance products for Haitian households and businesses. Approved amount: $2,000,000.',
+        ],
+        [
+            'title'  => 'IDB Haiti Productive Infrastructure Investment',
+            'url'    => 'https://www.iadb.org/en/news/haiti-will-invest-productive-infrastructure-idbs-support',
+            'amount' => 60000000,
+            'sector' => 'SME',
+            'type'   => 'Loan',
+            'desc'   => 'IDB supporting Haiti to invest in productive infrastructure for economic growth, including roads, energy, and trade facilitation. Total: $60,000,000.',
+        ],
+        [
+            'title'  => 'IDB Invest Solar Energy Solutions for Haiti',
+            'url'    => 'https://idbinvest.org/en/countries/haiti',
+            'amount' => 13500000,
+            'sector' => 'Energy',
+            'type'   => 'Loan',
+            'desc'   => 'IDB Invest US$13.5 million investment in Solengy Haiti S.A. for solar energy solutions to households, schools, hospitals, and businesses in Haiti. Approved March 2025.',
+        ],
+        [
+            'title'  => 'IDB Small Projects Financing Program Haiti',
+            'url'    => 'https://www.iadb.org/en/project/HA-L1120',
+            'amount' => 500000,
+            'sector' => 'SME',
+            'type'   => 'Loan',
+            'desc'   => 'IDB institutional support for small projects financing program in Haiti, supporting micro and small enterprises. Approved: $500,000.',
+        ],
+        [
+            'title'  => 'IDB Towards a Sustainable Energy Sector in Haiti',
+            'url'    => 'https://www.iadb.org/en/project/HA-T1130',
+            'amount' => 1000000,
+            'sector' => 'Energy',
+            'type'   => 'Grant',
+            'desc'   => 'IDB technical cooperation to develop a sustainable energy roadmap for Haiti. Includes white paper, policy recommendations, and capacity building.',
+        ],
+    ];
+
+    foreach ($idb_haiti as $project) {
+        if (opphub_post_exists($project['title'], $project['url'])) continue;
+
+        opphub_create_opportunity(
+            $project['title'],
+            $project['desc'],
+            current_time('mysql'),
+            $project['url'],
+            [
+                'institution' => 'IDB',
+                'type'        => $project['type'],
+                'region'      => ['Haiti', 'Caribbean'],
+                'sector'      => $project['sector'],
+                'funding_max' => $project['amount'],
+            ]
+        );
+    }
+
+    // ---- USAID Haiti Projects ----
+    $usaid_haiti = [
+        [
+            'title'  => 'USAID Haiti Food Security and Agriculture Program',
+            'url'    => 'https://foreignassistance.gov/cd/haiti/',
+            'amount' => 107600000,
+            'sector' => 'Agriculture',
+            'type'   => 'Grant',
+            'desc'   => 'USAID food security funding for Haiti — over $107 million allocated for agricultural development, emergency food response, and nutrition programs. Fiscal Year 2024.',
+        ],
+        [
+            'title'  => 'USAID Haiti Health and HIV/AIDS Prevention Program',
+            'url'    => 'https://foreignassistance.gov/cd/haiti/',
+            'amount' => 80000000,
+            'sector' => 'Health',
+            'type'   => 'Grant',
+            'desc'   => 'USAID comprehensive health program in Haiti including HIV/AIDS prevention and treatment, maternal and child health services. Annual funding approximately $80 million.',
+        ],
+        [
+            'title'  => 'USAID Haiti Water Systems and Reforestation',
+            'url'    => 'https://foreignassistance.gov/cd/haiti/',
+            'amount' => 25000000,
+            'sector' => 'Health',
+            'type'   => 'Grant',
+            'desc'   => 'USAID programs to improve water, sanitation and hygiene (WASH) systems and support reforestation in Haiti. Implemented through DAI. Committed: $25 million.',
+        ],
+        [
+            'title'  => 'USAID Justice Renewal and Advancement in Haiti',
+            'url'    => 'https://foreignassistance.gov/cd/haiti/',
+            'amount' => 25000000,
+            'sector' => 'NGO',
+            'type'   => 'Grant',
+            'desc'   => 'USAID program for justice renewal and advancement in Haiti, implemented by Chemonics. Contract awarded December 2024. Value: $25 million.',
+        ],
+        [
+            'title'  => 'USAID Haiti Citizen Security Program',
+            'url'    => 'https://foreignassistance.gov/cd/haiti/',
+            'amount' => 24000000,
+            'sector' => 'NGO',
+            'type'   => 'Grant',
+            'desc'   => 'USAID five-year program focused on citizen security in Haiti, implemented by Tetra Tech. Total program value: $24 million.',
+        ],
+        [
+            'title'  => 'USAID Haiti Energy Resilience and Clean Energy',
+            'url'    => 'https://www.nrel.gov/news/program/2024/haiti-builds-a-path-to-a-clean-resilient-energy-future.html',
+            'amount' => 15000000,
+            'sector' => 'Energy',
+            'type'   => 'Grant',
+            'desc'   => 'USAID-NREL partnership developing energy modeling, microgrids, agrivoltaics, and off-grid solar power to enhance energy resilience and security in Haiti.',
+        ],
+        [
+            'title'  => 'USAID Haiti Education and Workforce Development',
+            'url'    => 'https://foreignassistance.gov/cd/haiti/',
+            'amount' => 30000000,
+            'sector' => 'Education',
+            'type'   => 'Grant',
+            'desc'   => 'USAID education programs in Haiti providing basic education, school feeding, teacher training, and workforce development. Annual allocation approximately $30 million.',
+        ],
+        [
+            'title'  => 'USAID Haiti Emergency Response and Humanitarian Aid',
+            'url'    => 'https://foreignassistance.gov/cd/haiti/',
+            'amount' => 317000000,
+            'sector' => 'NGO',
+            'type'   => 'Grant',
+            'desc'   => 'USAID total humanitarian and development assistance to Haiti in 2024 — over $317 million covering emergency response, health, food aid, security, and agricultural development.',
+        ],
+    ];
+
+    foreach ($usaid_haiti as $project) {
+        if (opphub_post_exists($project['title'], $project['url'])) continue;
+
+        opphub_create_opportunity(
+            $project['title'],
+            $project['desc'],
+            current_time('mysql'),
+            $project['url'],
+            [
+                'institution' => 'USAID',
+                'type'        => $project['type'],
+                'region'      => ['Haiti', 'Caribbean'],
+                'sector'      => $project['sector'],
+                'funding_max' => $project['amount'],
+            ]
         );
     }
 }

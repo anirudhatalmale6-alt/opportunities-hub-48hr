@@ -175,7 +175,7 @@ $sectors       = get_terms(['taxonomy' => 'sector', 'hide_empty' => false]);
 </div>
 
 <script>
-/* Inline auto-loader v2.9 — bypasses Cloudflare page & JS cache */
+/* Inline auto-loader v3.0 — bypasses Cloudflare page & JS cache */
 (function(){
     if (typeof jQuery === 'undefined' || typeof opphub_ajax === 'undefined') return;
     jQuery(function($){
