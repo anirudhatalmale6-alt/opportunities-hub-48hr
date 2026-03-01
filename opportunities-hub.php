@@ -2,14 +2,14 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 1.7.1
+ * Version: 1.8.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
 
 if (!defined('ABSPATH')) exit;
 
-define('OPP_HUB_VERSION', '1.7.1');
+define('OPP_HUB_VERSION', '1.8.0');
 define('OPP_HUB_PATH', plugin_dir_path(__FILE__));
 define('OPP_HUB_URL', plugin_dir_url(__FILE__));
 
@@ -275,6 +275,7 @@ function opphub_render_feed() {
 
     header('Content-Type: ' . feed_content_type('rss2') . '; charset=' . get_option('blog_charset'), true);
     echo '<?xml version="1.0" encoding="' . get_option('blog_charset') . '"?' . '>';
+    echo '<?xml-stylesheet type="text/xsl" href="' . esc_url(OPP_HUB_URL . 'assets/rss-style.xsl') . '"?' . '>';
     ?>
 <rss version="2.0"
     xmlns:atom="http://www.w3.org/2005/Atom"
@@ -370,15 +371,27 @@ function opphub_ajax_filter() {
 
     $meta_query = [];
 
-    // Deadline filter
+    // Deadline filter — include posts without deadline set (auto-imported)
     if (!empty($_POST['deadline_status'])) {
         $today = date('Y-m-d');
         if ($_POST['deadline_status'] === 'open') {
             $meta_query[] = [
-                'key'     => '_opphub_deadline',
-                'value'   => $today,
-                'compare' => '>=',
-                'type'    => 'DATE',
+                'relation' => 'OR',
+                [
+                    'key'     => '_opphub_deadline',
+                    'value'   => $today,
+                    'compare' => '>=',
+                    'type'    => 'DATE',
+                ],
+                [
+                    'key'     => '_opphub_deadline',
+                    'compare' => 'NOT EXISTS',
+                ],
+                [
+                    'key'     => '_opphub_deadline',
+                    'value'   => '',
+                    'compare' => '=',
+                ],
             ];
         } elseif ($_POST['deadline_status'] === 'closing_soon') {
             $meta_query[] = [
@@ -390,7 +403,7 @@ function opphub_ajax_filter() {
         }
     }
 
-    // Funding size filter
+    // Funding size filter — include posts without funding set (auto-imported)
     if (!empty($_POST['funding_size'])) {
         $size = sanitize_text_field($_POST['funding_size']);
         $ranges = [
@@ -401,10 +414,22 @@ function opphub_ajax_filter() {
         ];
         if (isset($ranges[$size])) {
             $meta_query[] = [
-                'key'     => '_opphub_funding_max',
-                'value'   => $ranges[$size],
-                'compare' => 'BETWEEN',
-                'type'    => 'NUMERIC',
+                'relation' => 'OR',
+                [
+                    'key'     => '_opphub_funding_max',
+                    'value'   => $ranges[$size],
+                    'compare' => 'BETWEEN',
+                    'type'    => 'NUMERIC',
+                ],
+                [
+                    'key'     => '_opphub_funding_max',
+                    'compare' => 'NOT EXISTS',
+                ],
+                [
+                    'key'     => '_opphub_funding_max',
+                    'value'   => '',
+                    'compare' => '=',
+                ],
             ];
         }
     }
