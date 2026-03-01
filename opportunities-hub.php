@@ -356,17 +356,38 @@ add_action('wp_ajax_nopriv_opphub_filter', 'opphub_ajax_filter');
 function opphub_ajax_filter() {
     check_ajax_referer('opphub_filter', 'nonce');
 
+    // Primary filters: institution and region (most important to client)
     $tax_query = [];
+    // Secondary filters: funding_type and sector (nice-to-have, relax if no results)
+    $secondary_tax = [];
 
-    $taxonomies = ['institution', 'funding_type', 'region', 'sector'];
-    foreach ($taxonomies as $tax) {
-        if (!empty($_POST[$tax])) {
-            $tax_query[] = [
-                'taxonomy' => $tax,
-                'field'    => 'slug',
-                'terms'    => sanitize_text_field($_POST[$tax]),
-            ];
-        }
+    if (!empty($_POST['institution'])) {
+        $tax_query[] = [
+            'taxonomy' => 'institution',
+            'field'    => 'slug',
+            'terms'    => sanitize_text_field($_POST['institution']),
+        ];
+    }
+    if (!empty($_POST['region'])) {
+        $tax_query[] = [
+            'taxonomy' => 'region',
+            'field'    => 'slug',
+            'terms'    => sanitize_text_field($_POST['region']),
+        ];
+    }
+    if (!empty($_POST['funding_type'])) {
+        $secondary_tax[] = [
+            'taxonomy' => 'funding_type',
+            'field'    => 'slug',
+            'terms'    => sanitize_text_field($_POST['funding_type']),
+        ];
+    }
+    if (!empty($_POST['sector'])) {
+        $secondary_tax[] = [
+            'taxonomy' => 'sector',
+            'field'    => 'slug',
+            'terms'    => sanitize_text_field($_POST['sector']),
+        ];
     }
 
     $meta_query = [];
@@ -441,14 +462,30 @@ function opphub_ajax_filter() {
         'order'          => 'DESC',
     ];
 
-    if (!empty($tax_query)) {
-        $args['tax_query'] = array_merge(['relation' => 'AND'], $tax_query);
+    // Build full tax query: primary + secondary filters
+    $all_tax = array_merge($tax_query, $secondary_tax);
+    if (!empty($all_tax)) {
+        $args['tax_query'] = array_merge(['relation' => 'AND'], $all_tax);
     }
     if (!empty($meta_query)) {
         $args['meta_query'] = array_merge(['relation' => 'AND'], $meta_query);
     }
 
     $query = new WP_Query($args);
+
+    // Smart fallback: if 0 results and we had secondary filters, retry with just primary
+    if ($query->found_posts === 0 && !empty($secondary_tax) && !empty($tax_query)) {
+        $args['tax_query'] = array_merge(['relation' => 'AND'], $tax_query);
+        $query = new WP_Query($args);
+    }
+
+    // Second fallback: if still 0 and we had meta filters, retry without meta
+    if ($query->found_posts === 0 && !empty($meta_query) && !empty($tax_query)) {
+        unset($args['meta_query']);
+        $args['tax_query'] = array_merge(['relation' => 'AND'], $tax_query);
+        $query = new WP_Query($args);
+    }
+
     ob_start();
 
     if ($query->have_posts()) :
