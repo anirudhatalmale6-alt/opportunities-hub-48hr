@@ -2,14 +2,14 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 1.2.0
+ * Version: 1.3.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
 
 if (!defined('ABSPATH')) exit;
 
-define('OPP_HUB_VERSION', '1.2.0');
+define('OPP_HUB_VERSION', '1.3.0');
 define('OPP_HUB_PATH', plugin_dir_path(__FILE__));
 define('OPP_HUB_URL', plugin_dir_url(__FILE__));
 
@@ -491,33 +491,59 @@ function opphub_maybe_flush_rewrite() {
 }
 
 // ============================================================
-// 10. FLOATING CTA BUTTON ON ALL PAGES (JS INJECTION)
+// 10. CTA BUTTON INJECTED AFTER "START FREE LEARNING" + MOBILE STICKY
 // ============================================================
-add_action('wp_head', 'opphub_floating_cta_css');
-function opphub_floating_cta_css() {
+add_action('wp_head', 'opphub_cta_css');
+function opphub_cta_css() {
     if (is_admin()) return;
     ?>
-    <style id="opphub-floating-cta-css">
-        #opphub-floating-cta{position:fixed;bottom:20px;right:20px;z-index:999999}
-        #opphub-floating-cta a{display:inline-block;background:linear-gradient(135deg,#D32F2F,#B71C1C);color:#fff!important;padding:14px 24px;border-radius:50px;font-size:15px;font-weight:700;text-decoration:none!important;box-shadow:0 4px 20px rgba(211,47,47,0.4);transition:all .3s ease;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;line-height:1.4}
-        #opphub-floating-cta a:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(211,47,47,0.5);color:#fff!important}
-        @media(max-width:768px){#opphub-floating-cta{bottom:0;left:0;right:0;padding:0}#opphub-floating-cta a{display:block;text-align:center;border-radius:0;padding:16px 20px;font-size:16px}}
+    <style id="opphub-cta-css">
+        #opphub-inline-cta{text-align:center;padding:20px 15px 10px;width:100%;max-width:600px;margin:0 auto}
+        #opphub-inline-cta a{display:inline-block;background:linear-gradient(135deg,#D32F2F,#B71C1C);color:#fff!important;padding:16px 32px;border-radius:50px;font-size:17px;font-weight:700;text-decoration:none!important;box-shadow:0 4px 20px rgba(211,47,47,0.4);transition:all .3s ease;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;line-height:1.4;width:90%;max-width:500px;text-align:center}
+        #opphub-inline-cta a:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(211,47,47,0.5);color:#fff!important}
+        @media(max-width:768px){#opphub-inline-cta a{width:90%;font-size:16px;padding:16px 20px}}
     </style>
     <?php
 }
 
-add_action('wp_footer', 'opphub_floating_cta_html', 999);
-function opphub_floating_cta_html() {
+add_action('wp_footer', 'opphub_cta_html', 999);
+function opphub_cta_html() {
     if (is_admin()) return;
     $hub_url = esc_url(home_url('/funding-hub'));
     ?>
     <script>
     (function(){
-        if(document.getElementById('opphub-floating-cta'))return;
+        if(document.getElementById('opphub-inline-cta'))return;
         if(window.location.pathname.indexOf('funding-hub')!==-1)return;
-        var d=document.createElement('div');d.id='opphub-floating-cta';
-        d.innerHTML='<a href="<?php echo $hub_url; ?>">&#128176; Explore Funding Opportunities</a>';
-        document.body.appendChild(d);
+
+        // Find the "Start Free Learning" button/link on the page
+        var allLinks=document.querySelectorAll('a, button, span, div');
+        var target=null;
+        for(var i=0;i<allLinks.length;i++){
+            var txt=(allLinks[i].textContent||'').trim().toLowerCase();
+            if(txt.indexOf('start free learning')!==-1){
+                // Walk up to find the parent wrapper element
+                target=allLinks[i].closest('.elementor-widget')||allLinks[i].closest('.elementor-element')||allLinks[i].parentElement;
+                break;
+            }
+        }
+
+        var cta=document.createElement('div');
+        cta.id='opphub-inline-cta';
+        cta.innerHTML='<a href="<?php echo $hub_url; ?>">&#128176; Explore Funding Opportunities</a>';
+
+        if(target&&target.parentNode){
+            // Insert right after the "Start Free Learning" element
+            target.parentNode.insertBefore(cta,target.nextSibling);
+        } else {
+            // Fallback: find the main content area and prepend near the top
+            var main=document.querySelector('.elementor-section-wrap')||document.querySelector('#content')||document.querySelector('main')||document.body;
+            if(main.children.length>2){
+                main.insertBefore(cta,main.children[2]);
+            } else {
+                main.appendChild(cta);
+            }
+        }
     })();
     </script>
     <?php
