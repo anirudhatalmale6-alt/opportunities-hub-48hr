@@ -2,7 +2,7 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 3.15.0
+ * Version: 3.16.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
@@ -954,7 +954,7 @@ function opphub_video_language_swap() {
         if (widget && !document.querySelector('.opphub-hero-slogan')) {
             var slogan = document.createElement('div');
             slogan.className = 'opphub-hero-slogan';
-            slogan.innerHTML = '<p style="text-align:center;color:#4A90D9;font-size:1.5rem;font-weight:800;margin:5px 0 15px;letter-spacing:2px;text-shadow:1px 1px 2px rgba(0,0,0,0.5);">Learn. Structure. Earn.</p>';
+            slogan.innerHTML = '<p style="text-align:center;color:#4A90D9;font-size:1.5rem;font-weight:800;margin:-15px 0 10px;letter-spacing:2px;text-shadow:1px 1px 2px rgba(0,0,0,0.5);">Learn. Structure. Earn.</p>';
             widget.after(slogan);
         }
     })();
