@@ -2,7 +2,7 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 3.21.0
+ * Version: 3.21.1
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
@@ -1124,8 +1124,8 @@ function opphub_og_meta_tags() {
 
     $og_image = get_option('opphub_og_image', '');
     if (empty($og_image)) {
-        // Fallback to the branded logo with solid background
-        $og_image = 'https://48hoursready.com/wp-content/uploads/2026/03/file_00000000d5e871fd8a43d4d3e14ff08a.png';
+        // Use GitHub-hosted JPEG to bypass Cloudflare Polish (which converts PNG→WebP and breaks WhatsApp previews)
+        $og_image = 'https://raw.githubusercontent.com/anirudhatalmale6-alt/opportunities-hub-48hr/master/assets/images/og-preview.jpg';
     }
 
     $og_title       = '48HoursReady — Learn. Structure. Earn.';
@@ -1137,9 +1137,9 @@ function opphub_og_meta_tags() {
     <meta property="og:title" content="<?php echo esc_attr($og_title); ?>">
     <meta property="og:description" content="<?php echo esc_attr($og_description); ?>">
     <meta property="og:image" content="<?php echo esc_url($og_image); ?>">
-    <meta property="og:image:width" content="1536">
-    <meta property="og:image:height" content="1024">
-    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:type" content="image/jpeg">
     <meta property="og:url" content="<?php echo esc_url($og_url); ?>">
     <meta property="og:site_name" content="48HoursReady">
     <meta name="twitter:card" content="summary_large_image">
