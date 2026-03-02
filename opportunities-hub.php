@@ -2,7 +2,7 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 3.18.0
+ * Version: 3.19.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
@@ -647,6 +647,24 @@ function opphub_cta_html() {
         .elementor-element[data-id="95a2f99"],
         .elementor-element[data-id="85786cf"] { display: none !important; }
 
+        /* ===== UNIFORM CTA BUTTONS: Same width + tighter spacing ===== */
+        /* Tighten vertical gap between buttons */
+        .elementor-element[data-id="d1436f5"] { gap: 10px !important; }
+        .elementor-element[data-id="6cc3489"] { gap: 8px !important; }
+        .elementor-element[data-id="f6e2286"] { gap: 8px !important; }
+
+        /* All CTA buttons: same width, centered */
+        .elementor-element[data-id="5027090"] .elementor-button,
+        .elementor-element[data-id="cea65ef"] .elementor-button,
+        .elementor-element[data-id="7482748"] .elementor-button,
+        .elementor-element[data-id="acac7a0"] .elementor-button {
+            min-width: 420px !important;
+            text-align: center !important;
+            justify-content: center !important;
+            padding: 10px 24px !important;
+            font-size: 18px !important;
+        }
+
         /* "Get Started" (primary action) → Red */
         .elementor-element[data-id="5027090"] .elementor-button {
             background-color: #D32F2F !important;
@@ -735,10 +753,11 @@ function opphub_cta_html() {
             display: inline-block !important;
             background: linear-gradient(135deg, #43A047, #2E7D32) !important;
             color: #fff !important;
-            padding: 14px 36px !important;
-            border-radius: 6px !important;
-            font-size: 16px !important;
-            font-weight: 700 !important;
+            min-width: 420px !important;
+            padding: 10px 24px !important;
+            border-radius: 3px !important;
+            font-size: 18px !important;
+            font-weight: 600 !important;
             text-decoration: none !important;
             text-align: center !important;
             letter-spacing: 0.5px !important;
