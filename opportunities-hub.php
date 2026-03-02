@@ -2,14 +2,14 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 3.3.0
+ * Version: 3.4.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
 
 if (!defined('ABSPATH')) exit;
 
-define('OPP_HUB_VERSION', '3.3.0');
+define('OPP_HUB_VERSION', '3.4.0');
 define('OPP_HUB_PATH', plugin_dir_path(__FILE__));
 define('OPP_HUB_URL', plugin_dir_url(__FILE__));
 
@@ -647,43 +647,67 @@ function opphub_cta_html() {
             width: 100%;
             background: linear-gradient(135deg, #0d1b4a 0%, #1a237e 100%);
         }
+        #opphub-inline-cta .opphub-cta-wrap {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            max-width: 700px;
+            margin: 0 auto;
+        }
         #opphub-inline-cta a {
             display: inline-block;
-            background: linear-gradient(135deg, #D32F2F, #B71C1C);
-            color: #fff !important;
-            padding: 18px 40px;
+            padding: 18px 32px;
             border-radius: 8px;
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 700;
             text-decoration: none !important;
-            box-shadow: 0 4px 20px rgba(211,47,47,0.4);
             transition: all 0.3s ease;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             line-height: 1.4;
-            max-width: 500px;
-            width: 85%;
             text-align: center;
             letter-spacing: 0.5px;
+            flex: 1;
+            min-width: 250px;
         }
-        #opphub-inline-cta a:hover {
+        #opphub-inline-cta a.opphub-cta-funding {
+            background: linear-gradient(135deg, #D32F2F, #B71C1C);
+            color: #fff !important;
+            box-shadow: 0 4px 20px rgba(211,47,47,0.4);
+        }
+        #opphub-inline-cta a.opphub-cta-funding:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 28px rgba(211,47,47,0.5);
             background: linear-gradient(135deg, #E53935, #C62828);
+        }
+        #opphub-inline-cta a.opphub-cta-testimonials {
+            background: linear-gradient(135deg, #1565C0, #0D47A1);
             color: #fff !important;
+            box-shadow: 0 4px 20px rgba(21,101,192,0.4);
+        }
+        #opphub-inline-cta a.opphub-cta-testimonials:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 28px rgba(21,101,192,0.5);
+            background: linear-gradient(135deg, #1976D2, #1565C0);
         }
         @media (max-width: 768px) {
             #opphub-inline-cta { padding: 25px 15px 30px; }
-            #opphub-inline-cta a { width: 90%; font-size: 16px; padding: 16px 24px; }
+            #opphub-inline-cta .opphub-cta-wrap { flex-direction: column; }
+            #opphub-inline-cta a { width: 100%; min-width: 0; font-size: 16px; padding: 16px 24px; }
         }
     </style>
     <script>
     (function(){
         if(document.getElementById('opphub-inline-cta')) return;
-        if(window.location.pathname.indexOf('funding-hub') !== -1) return;
+        if(window.location.pathname.indexOf('funding-hub') !== -1 || window.location.pathname.indexOf('testimonials') !== -1) return;
 
         var cta = document.createElement('div');
         cta.id = 'opphub-inline-cta';
-        cta.innerHTML = '<a href="<?php echo $hub_url; ?>">&#128176; Explore Funding Opportunities</a>';
+        cta.innerHTML = '<div class="opphub-cta-wrap">' +
+            '<a href="<?php echo $hub_url; ?>" class="opphub-cta-funding">&#128176; Explore Funding Opportunities</a>' +
+            '<a href="<?php echo esc_url(home_url('/testimonials/')); ?>" class="opphub-cta-testimonials">&#11088; Read Client Testimonials</a>' +
+            '</div>';
 
         // Primary: Insert before the "Choose the application type" parent section
         var chooseSection = document.querySelector('[data-id="de4e74e"]');
