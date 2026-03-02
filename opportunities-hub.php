@@ -2,7 +2,7 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 3.11.0
+ * Version: 3.12.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
@@ -701,30 +701,30 @@ function opphub_cta_html() {
             color: #fff !important;
         }
 
-        /* "Coursera" → White with dark text */
+        /* "Coursera" → Coursera blue */
         .elementor-element[data-id="636b0d3"] .elementor-button {
-            background-color: #fff !important;
-            border: 1px solid #ccc !important;
-            color: #333 !important;
+            background-color: #0056D2 !important;
+            border: none !important;
+            color: #fff !important;
         }
         .elementor-element[data-id="636b0d3"] .elementor-button .elementor-button-text {
-            color: #333 !important;
+            color: #fff !important;
         }
         .elementor-element[data-id="636b0d3"] .elementor-button:hover {
-            background-color: #f5f5f5 !important;
+            background-color: #0042A3 !important;
         }
 
-        /* "Udemy" → White with dark text */
+        /* "Udemy" → Udemy purple */
         .elementor-element[data-id="9a2c434"] .elementor-button {
-            background-color: #fff !important;
-            border: 1px solid #ccc !important;
-            color: #333 !important;
+            background-color: #A435F0 !important;
+            border: none !important;
+            color: #fff !important;
         }
         .elementor-element[data-id="9a2c434"] .elementor-button .elementor-button-text {
-            color: #333 !important;
+            color: #fff !important;
         }
         .elementor-element[data-id="9a2c434"] .elementor-button:hover {
-            background-color: #f5f5f5 !important;
+            background-color: #8710D8 !important;
         }
 
         /* Bottom "Get Business Ready" + other green CTAs → keep red */
