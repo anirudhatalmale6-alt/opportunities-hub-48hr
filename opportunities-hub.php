@@ -2,14 +2,14 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 3.1.0
+ * Version: 3.2.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
 
 if (!defined('ABSPATH')) exit;
 
-define('OPP_HUB_VERSION', '3.1.0');
+define('OPP_HUB_VERSION', '3.2.0');
 define('OPP_HUB_PATH', plugin_dir_path(__FILE__));
 define('OPP_HUB_URL', plugin_dir_url(__FILE__));
 
@@ -328,7 +328,7 @@ Region: <?php echo esc_html(implode(', ', wp_list_pluck($regions, 'name'))); ?>
 // Prevent Cloudflare/browser caching of the funding hub page
 add_action('template_redirect', 'opphub_no_cache_headers');
 function opphub_no_cache_headers() {
-    if (is_page('funding-hub') || (is_page() && get_page_template_slug() === 'opphub-landing.php')) {
+    if (is_page('funding-hub') || is_page('testimonials') || (is_page() && in_array(get_page_template_slug(), ['opphub-landing.php', 'opphub-testimonials.php']))) {
         nocache_headers();
         header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
         header('Pragma: no-cache');
@@ -338,9 +338,16 @@ function opphub_no_cache_headers() {
 
 add_action('wp_enqueue_scripts', 'opphub_enqueue_assets');
 function opphub_enqueue_assets() {
-    if (is_page('funding-hub') || (is_page() && get_page_template_slug() === 'opphub-landing.php')) {
+    $is_hub = is_page('funding-hub') || (is_page() && get_page_template_slug() === 'opphub-landing.php');
+    $is_testimonials = is_page('testimonials') || (is_page() && get_page_template_slug() === 'opphub-testimonials.php');
+
+    if ($is_hub || $is_testimonials) {
         $cache_bust = OPP_HUB_VERSION . '.' . time();
         wp_enqueue_style('opphub-style', OPP_HUB_URL . 'assets/css/opphub.css', [], $cache_bust);
+    }
+
+    if ($is_hub) {
+        $cache_bust = OPP_HUB_VERSION . '.' . time();
         wp_enqueue_script('opphub-script', OPP_HUB_URL . 'assets/js/opphub.js', ['jquery'], $cache_bust, true);
         wp_localize_script('opphub-script', 'opphub_ajax', [
             'ajax_url' => admin_url('admin-ajax.php'),
