@@ -2,14 +2,14 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 3.5.0
+ * Version: 3.6.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
 
 if (!defined('ABSPATH')) exit;
 
-define('OPP_HUB_VERSION', '3.5.0');
+define('OPP_HUB_VERSION', '3.6.0');
 define('OPP_HUB_PATH', plugin_dir_path(__FILE__));
 define('OPP_HUB_URL', plugin_dir_url(__FILE__));
 
@@ -641,60 +641,156 @@ function opphub_cta_html() {
     $hub_url = esc_url(home_url('/funding-hub'));
     ?>
     <style id="opphub-cta-css">
+        /* ===== HOMEPAGE RESTYLE: Differentiate buttons by purpose ===== */
+
+        /* Hide Affiliate Payout Details — handled by ambassador onboarding now */
+        .elementor-element[data-id="95a2f99"] { display: none !important; }
+
+        /* "Get Started" (primary action) → Red */
+        .elementor-element[data-id="5027090"] .elementor-button {
+            background-color: #D32F2F !important;
+            border-color: #D32F2F !important;
+        }
+        .elementor-element[data-id="5027090"] .elementor-button:hover {
+            background-color: #B71C1C !important;
+            border-color: #B71C1C !important;
+        }
+
+        /* "Apply for Student Program" → Blue */
+        .elementor-element[data-id="cea65ef"] .elementor-button {
+            background-color: #1565C0 !important;
+            border-color: #1565C0 !important;
+        }
+        .elementor-element[data-id="cea65ef"] .elementor-button:hover {
+            background-color: #0D47A1 !important;
+            border-color: #0D47A1 !important;
+        }
+
+        /* "Become an Ambassador" → Red outline */
+        .elementor-element[data-id="7482748"] .elementor-button {
+            background-color: transparent !important;
+            border: 2px solid #D32F2F !important;
+            color: #D32F2F !important;
+        }
+        .elementor-element[data-id="7482748"] .elementor-button .elementor-button-text {
+            color: #D32F2F !important;
+        }
+        .elementor-element[data-id="7482748"] .elementor-button:hover {
+            background-color: #D32F2F !important;
+            color: #fff !important;
+        }
+        .elementor-element[data-id="7482748"] .elementor-button:hover .elementor-button-text {
+            color: #fff !important;
+        }
+
+        /* "Influencer Recruiter" → Blue outline */
+        .elementor-element[data-id="acac7a0"] .elementor-button {
+            background-color: transparent !important;
+            border: 2px solid #1565C0 !important;
+            color: #1565C0 !important;
+        }
+        .elementor-element[data-id="acac7a0"] .elementor-button .elementor-button-text {
+            color: #1565C0 !important;
+        }
+        .elementor-element[data-id="acac7a0"] .elementor-button:hover {
+            background-color: #1565C0 !important;
+            color: #fff !important;
+        }
+        .elementor-element[data-id="acac7a0"] .elementor-button:hover .elementor-button-text {
+            color: #fff !important;
+        }
+
+        /* "Coursera" → White with dark text */
+        .elementor-element[data-id="636b0d3"] .elementor-button {
+            background-color: #fff !important;
+            border: 1px solid #ccc !important;
+            color: #333 !important;
+        }
+        .elementor-element[data-id="636b0d3"] .elementor-button .elementor-button-text {
+            color: #333 !important;
+        }
+        .elementor-element[data-id="636b0d3"] .elementor-button:hover {
+            background-color: #f5f5f5 !important;
+        }
+
+        /* "Udemy" → White with dark text */
+        .elementor-element[data-id="9a2c434"] .elementor-button {
+            background-color: #fff !important;
+            border: 1px solid #ccc !important;
+            color: #333 !important;
+        }
+        .elementor-element[data-id="9a2c434"] .elementor-button .elementor-button-text {
+            color: #333 !important;
+        }
+        .elementor-element[data-id="9a2c434"] .elementor-button:hover {
+            background-color: #f5f5f5 !important;
+        }
+
+        /* Bottom "Get Business Ready" + other green CTAs → keep red */
+        .elementor-element[data-id="5b397e3"] .elementor-button,
+        .elementor-element[data-id="b8fc02c"] .elementor-button,
+        .elementor-element[data-id="4309873"] .elementor-button {
+            background-color: #D32F2F !important;
+            border-color: #D32F2F !important;
+        }
+        .elementor-element[data-id="5b397e3"] .elementor-button:hover,
+        .elementor-element[data-id="b8fc02c"] .elementor-button:hover,
+        .elementor-element[data-id="4309873"] .elementor-button:hover {
+            background-color: #B71C1C !important;
+            border-color: #B71C1C !important;
+        }
+
+        /* ===== Plugin CTA: Single clean button ===== */
         #opphub-inline-cta {
             text-align: center;
             padding: 30px 20px 40px;
             width: 100%;
             background: linear-gradient(135deg, #0d1b4a 0%, #1a237e 100%);
         }
-        #opphub-inline-cta .opphub-cta-wrap {
-            display: flex;
-            gap: 16px;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
-            max-width: 700px;
-            margin: 0 auto;
-        }
         #opphub-inline-cta a {
             display: inline-block;
-            padding: 18px 32px;
+            background: linear-gradient(135deg, #D32F2F, #B71C1C);
+            color: #fff !important;
+            padding: 18px 40px;
             border-radius: 8px;
-            font-size: 17px;
+            font-size: 18px;
             font-weight: 700;
             text-decoration: none !important;
+            box-shadow: 0 4px 20px rgba(211,47,47,0.4);
             transition: all 0.3s ease;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             line-height: 1.4;
+            max-width: 500px;
+            width: 85%;
             text-align: center;
             letter-spacing: 0.5px;
-            flex: 1;
-            min-width: 250px;
         }
-        #opphub-inline-cta a.opphub-cta-funding {
-            background: linear-gradient(135deg, #D32F2F, #B71C1C);
-            color: #fff !important;
-            box-shadow: 0 4px 20px rgba(211,47,47,0.4);
-        }
-        #opphub-inline-cta a.opphub-cta-funding:hover {
+        #opphub-inline-cta a:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 28px rgba(211,47,47,0.5);
             background: linear-gradient(135deg, #E53935, #C62828);
-        }
-        #opphub-inline-cta a.opphub-cta-testimonials {
-            background: linear-gradient(135deg, #1565C0, #0D47A1);
             color: #fff !important;
-            box-shadow: 0 4px 20px rgba(21,101,192,0.4);
         }
-        #opphub-inline-cta a.opphub-cta-testimonials:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 28px rgba(21,101,192,0.5);
-            background: linear-gradient(135deg, #1976D2, #1565C0);
+        #opphub-inline-cta .opphub-cta-sub {
+            display: block;
+            margin-top: 12px;
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+        }
+        #opphub-inline-cta .opphub-cta-sub a {
+            display: inline;
+            background: none;
+            box-shadow: none;
+            color: rgba(255,255,255,0.8) !important;
+            font-size: 13px;
+            font-weight: 400;
+            padding: 0;
+            width: auto;
+            text-decoration: underline !important;
         }
         @media (max-width: 768px) {
             #opphub-inline-cta { padding: 25px 15px 30px; }
-            #opphub-inline-cta .opphub-cta-wrap { flex-direction: column; }
-            #opphub-inline-cta a { width: 100%; min-width: 0; font-size: 16px; padding: 16px 24px; }
+            #opphub-inline-cta a { width: 90%; font-size: 16px; padding: 16px 24px; }
         }
     </style>
     <script>
@@ -704,10 +800,8 @@ function opphub_cta_html() {
 
         var cta = document.createElement('div');
         cta.id = 'opphub-inline-cta';
-        cta.innerHTML = '<div class="opphub-cta-wrap">' +
-            '<a href="<?php echo $hub_url; ?>" class="opphub-cta-funding">&#128176; Explore Funding Opportunities</a>' +
-            '<a href="<?php echo esc_url(home_url('/testimonials/')); ?>" class="opphub-cta-testimonials">&#11088; Read Client Testimonials</a>' +
-            '</div>';
+        cta.innerHTML = '<a href="<?php echo $hub_url; ?>">&#128176; Explore Funding Opportunities</a>' +
+            '<span class="opphub-cta-sub">&#11088; <a href="<?php echo esc_url(home_url('/testimonials/')); ?>">Read what our clients say</a></span>';
 
         // Primary: Insert before the "Choose the application type" parent section
         var chooseSection = document.querySelector('[data-id="de4e74e"]');
