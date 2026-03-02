@@ -2,7 +2,7 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 3.16.0
+ * Version: 3.17.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
@@ -1059,11 +1059,14 @@ function opphub_settings_page() {
             if (!empty($url)) $lang_videos[$lang] = $url;
         }
         update_option('opphub_language_videos', $lang_videos);
+        // Save founder photo URL
+        update_option('opphub_founder_photo', esc_url_raw($_POST['opphub_founder_photo'] ?? ''));
         echo '<div class="notice notice-success"><p>Settings saved!</p></div>';
     }
 
     $structured_url = get_option('opphub_structured_url', '');
     $lang_videos = get_option('opphub_language_videos', []);
+    $founder_photo = get_option('opphub_founder_photo', '');
     $last_import = get_option('opphub_last_import', 'Never');
     $import_count = get_option('opphub_last_import_count', 0);
     ?>
@@ -1095,6 +1098,17 @@ function opphub_settings_page() {
                     </td>
                 </tr>
                 <?php endforeach; ?>
+            </table>
+
+            <h2>About Us Page</h2>
+            <table class="form-table">
+                <tr>
+                    <th><label for="opphub_founder_photo">Founder Photo URL</label></th>
+                    <td>
+                        <input type="url" id="opphub_founder_photo" name="opphub_founder_photo" value="<?php echo esc_url($founder_photo); ?>" class="large-text" placeholder="https://48hoursready.com/wp-content/uploads/...">
+                        <p class="description">Upload the founder's photo to Media Library and paste the URL here. It will appear on the About Us page.</p>
+                    </td>
+                </tr>
             </table>
 
             <input type="submit" name="opphub_save_settings" class="button button-primary" value="Save Settings">
@@ -2315,6 +2329,48 @@ function opphub_ambassador_assets() {
     if (is_page('ambassador-welcome') || (is_page() && get_page_template_slug() === 'opphub-ambassador-welcome.php')) {
         $cache_bust = OPP_HUB_VERSION . '.' . time();
         wp_enqueue_style('opphub-style', OPP_HUB_URL . 'assets/css/opphub.css', [], $cache_bust);
+    }
+}
+
+// ============================================================
+// ABOUT US PAGE TEMPLATE
+// ============================================================
+add_filter('template_include', 'opphub_about_us_template');
+function opphub_about_us_template($template) {
+    if (is_page('about-us') || (is_page() && get_page_template_slug() === 'opphub-about-us.php')) {
+        $plugin_template = OPP_HUB_PATH . 'templates/about-us.php';
+        if (file_exists($plugin_template)) {
+            return $plugin_template;
+        }
+    }
+    return $template;
+}
+
+add_filter('theme_page_templates', 'opphub_add_about_us_template');
+function opphub_add_about_us_template($templates) {
+    $templates['opphub-about-us.php'] = 'About Us (48HoursReady)';
+    return $templates;
+}
+
+// Set the About Us page to use our template
+add_action('init', 'opphub_setup_about_us', 20);
+function opphub_setup_about_us() {
+    $page = get_page_by_path('about-us');
+    if ($page) {
+        $current = get_post_meta($page->ID, '_wp_page_template', true);
+        if ($current !== 'opphub-about-us.php') {
+            update_post_meta($page->ID, '_wp_page_template', 'opphub-about-us.php');
+        }
+    }
+}
+
+// No-cache headers for About Us
+add_action('template_redirect', 'opphub_about_us_no_cache');
+function opphub_about_us_no_cache() {
+    if (is_page('about-us')) {
+        nocache_headers();
+        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+        header('Pragma: no-cache');
     }
 }
 
