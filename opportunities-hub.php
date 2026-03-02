@@ -2,7 +2,7 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 3.21.1
+ * Version: 3.21.2
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
@@ -1122,11 +1122,9 @@ function opphub_og_meta_tags() {
     // Only inject on the homepage (other pages can use Yoast/default)
     if (!is_front_page() && !is_home()) return;
 
-    $og_image = get_option('opphub_og_image', '');
-    if (empty($og_image)) {
-        // Use GitHub-hosted JPEG to bypass Cloudflare Polish (which converts PNG→WebP and breaks WhatsApp previews)
-        $og_image = 'https://raw.githubusercontent.com/anirudhatalmale6-alt/opportunities-hub-48hr/master/assets/images/og-preview.jpg';
-    }
+    // Always use GitHub-hosted JPEG — Cloudflare Polish converts WordPress-hosted images
+    // to WebP which breaks WhatsApp/Facebook previews. GitHub serves clean JPEG.
+    $og_image = 'https://raw.githubusercontent.com/anirudhatalmale6-alt/opportunities-hub-48hr/master/assets/images/og-preview.jpg';
 
     $og_title       = '48HoursReady — Learn. Structure. Earn.';
     $og_description = 'Get structured in 48 hours. Bank-ready documentation, pitch decks, branding & video explainers for entrepreneurs worldwide.';
