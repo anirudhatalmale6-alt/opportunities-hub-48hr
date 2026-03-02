@@ -2,7 +2,7 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 3.17.0
+ * Version: 3.18.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
@@ -727,6 +727,30 @@ function opphub_cta_html() {
             background-color: #8710D8 !important;
         }
 
+        /* "Start Free Learning" → Replace image with green CTA button */
+        .elementor-element[data-id="24103f1"] img {
+            display: none !important;
+        }
+        .elementor-element[data-id="24103f1"] a {
+            display: inline-block !important;
+            background: linear-gradient(135deg, #43A047, #2E7D32) !important;
+            color: #fff !important;
+            padding: 14px 36px !important;
+            border-radius: 6px !important;
+            font-size: 16px !important;
+            font-weight: 700 !important;
+            text-decoration: none !important;
+            text-align: center !important;
+            letter-spacing: 0.5px !important;
+            transition: all 0.3s ease !important;
+            box-shadow: 0 2px 8px rgba(46,125,50,0.3) !important;
+        }
+        .elementor-element[data-id="24103f1"] a:hover {
+            background: linear-gradient(135deg, #2E7D32, #1B5E20) !important;
+            box-shadow: 0 4px 12px rgba(46,125,50,0.4) !important;
+            transform: translateY(-1px);
+        }
+
         /* Bottom "Get Business Ready" + other green CTAs → keep red */
         .elementor-element[data-id="5b397e3"] .elementor-button,
         .elementor-element[data-id="b8fc02c"] .elementor-button,
@@ -942,6 +966,21 @@ function opphub_video_language_swap() {
             heroWidget.insertBefore(h, heroWidget.firstChild);
         }
     })();
+    /* Replace "Start Free Learning" image with styled text button */
+    (function(){
+        var widget = document.querySelector('[data-id="24103f1"]');
+        if (!widget) return;
+        var img = widget.querySelector('img');
+        var link = widget.querySelector('a');
+        if (img) img.style.display = 'none';
+        if (link && !link.querySelector('.opphub-sfl-text')) {
+            link.textContent = '';
+            var span = document.createElement('span');
+            span.className = 'opphub-sfl-text';
+            span.textContent = '\uD83C\uDF93 Start Free Learning';
+            link.appendChild(span);
+        }
+    })();
     /* Replace hero logo with new transparent branding + slogan */
     (function(){
         var logoWidget = document.querySelector('[data-id="daeb49d"] img');
@@ -1026,6 +1065,38 @@ function opphub_video_language_swap() {
 }
 
 // ============================================================
+// 10c. OPEN GRAPH META TAGS (WhatsApp / Facebook / LinkedIn previews)
+// ============================================================
+add_action('wp_head', 'opphub_og_meta_tags', 5);
+function opphub_og_meta_tags() {
+    // Only inject on the homepage (other pages can use Yoast/default)
+    if (!is_front_page() && !is_home()) return;
+
+    $og_image = get_option('opphub_og_image', '');
+    if (empty($og_image)) {
+        // Fallback to the transparent hero logo
+        $og_image = 'https://48hoursready.com/wp-content/uploads/2026/03/file_000000008af871fd8f747afd5a20199a.png';
+    }
+
+    $og_title       = '48HoursReady — Learn. Structure. Earn.';
+    $og_description = 'Get structured in 48 hours. Bank-ready documentation, pitch decks, branding & video explainers for entrepreneurs worldwide.';
+    $og_url         = home_url('/');
+    ?>
+    <!-- 48HoursReady Open Graph Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="<?php echo esc_attr($og_title); ?>">
+    <meta property="og:description" content="<?php echo esc_attr($og_description); ?>">
+    <meta property="og:image" content="<?php echo esc_url($og_image); ?>">
+    <meta property="og:url" content="<?php echo esc_url($og_url); ?>">
+    <meta property="og:site_name" content="48HoursReady">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<?php echo esc_attr($og_title); ?>">
+    <meta name="twitter:description" content="<?php echo esc_attr($og_description); ?>">
+    <meta name="twitter:image" content="<?php echo esc_url($og_image); ?>">
+    <?php
+}
+
+// ============================================================
 // 11. SETTINGS PAGE FOR CTA LINKS
 // ============================================================
 add_action('admin_menu', 'opphub_settings_menu');
@@ -1061,12 +1132,15 @@ function opphub_settings_page() {
         update_option('opphub_language_videos', $lang_videos);
         // Save founder photo URL
         update_option('opphub_founder_photo', esc_url_raw($_POST['opphub_founder_photo'] ?? ''));
+        // Save OG image URL
+        update_option('opphub_og_image', esc_url_raw($_POST['opphub_og_image'] ?? ''));
         echo '<div class="notice notice-success"><p>Settings saved!</p></div>';
     }
 
     $structured_url = get_option('opphub_structured_url', '');
     $lang_videos = get_option('opphub_language_videos', []);
     $founder_photo = get_option('opphub_founder_photo', '');
+    $og_image = get_option('opphub_og_image', '');
     $last_import = get_option('opphub_last_import', 'Never');
     $import_count = get_option('opphub_last_import_count', 0);
     ?>
@@ -1098,6 +1172,17 @@ function opphub_settings_page() {
                     </td>
                 </tr>
                 <?php endforeach; ?>
+            </table>
+
+            <h2>Social Sharing (WhatsApp / Facebook Preview)</h2>
+            <table class="form-table">
+                <tr>
+                    <th><label for="opphub_og_image">OG Preview Image URL</label></th>
+                    <td>
+                        <input type="url" id="opphub_og_image" name="opphub_og_image" value="<?php echo esc_url($og_image); ?>" class="large-text" placeholder="https://48hoursready.com/wp-content/uploads/...">
+                        <p class="description">Upload your logo/image for WhatsApp &amp; Facebook link previews, then paste the URL here. Recommended: 1200x630px. If blank, the hero logo is used.</p>
+                    </td>
+                </tr>
             </table>
 
             <h2>About Us Page</h2>
