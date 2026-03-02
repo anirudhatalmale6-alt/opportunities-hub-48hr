@@ -2,7 +2,7 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 3.14.0
+ * Version: 3.15.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
@@ -942,13 +942,20 @@ function opphub_video_language_swap() {
             heroWidget.insertBefore(h, heroWidget.firstChild);
         }
     })();
-    /* Replace hero logo with new transparent branding */
+    /* Replace hero logo with new transparent branding + slogan */
     (function(){
         var logoWidget = document.querySelector('[data-id="daeb49d"] img');
         if (logoWidget) {
-            logoWidget.setAttribute('src', 'https://48hoursready.com/wp-content/uploads/2026/03/file_00000000daac71fdad4a5d8f3d0926bf.png');
+            logoWidget.setAttribute('src', 'https://48hoursready.com/wp-content/uploads/2026/03/file_000000008af871fd8f747afd5a20199a.png');
             logoWidget.setAttribute('srcset', '');
             logoWidget.style.background = 'transparent';
+        }
+        var widget = document.querySelector('[data-id="daeb49d"]');
+        if (widget && !document.querySelector('.opphub-hero-slogan')) {
+            var slogan = document.createElement('div');
+            slogan.className = 'opphub-hero-slogan';
+            slogan.innerHTML = '<p style="text-align:center;color:#4A90D9;font-size:1.5rem;font-weight:800;margin:5px 0 15px;letter-spacing:2px;text-shadow:1px 1px 2px rgba(0,0,0,0.5);">Learn. Structure. Earn.</p>';
+            widget.after(slogan);
         }
     })();
     </script>
