@@ -2,7 +2,7 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 3.9.0
+ * Version: 3.10.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
@@ -917,6 +917,32 @@ function opphub_video_language_swap() {
 
     $videos_json = wp_json_encode($videos);
     ?>
+    <style>
+    .opphub-video-heading {
+        text-align: center;
+        color: #D32F2F;
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin: 0 0 10px;
+        padding: 0 15px;
+        letter-spacing: 0.5px;
+    }
+    @media (max-width: 767px) {
+        .opphub-video-heading { font-size: 1.2rem; }
+    }
+    </style>
+    <script>
+    /* Insert heading above video widget */
+    (function(){
+        var heroWidget = document.querySelector('[data-id="a166997"]');
+        if (heroWidget && !document.querySelector('.opphub-video-heading')) {
+            var h = document.createElement('h2');
+            h.className = 'opphub-video-heading';
+            h.textContent = 'Watch How 48HoursReady Works';
+            heroWidget.parentNode.insertBefore(h, heroWidget);
+        }
+    })();
+    </script>
     <script>
     /* Language-specific video swap — detects GTranslate language */
     (function(){
