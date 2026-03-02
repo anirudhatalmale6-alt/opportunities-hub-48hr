@@ -2,14 +2,14 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 3.6.0
+ * Version: 3.7.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
 
 if (!defined('ABSPATH')) exit;
 
-define('OPP_HUB_VERSION', '3.6.0');
+define('OPP_HUB_VERSION', '3.7.0');
 define('OPP_HUB_PATH', plugin_dir_path(__FILE__));
 define('OPP_HUB_URL', plugin_dir_url(__FILE__));
 
@@ -643,8 +643,9 @@ function opphub_cta_html() {
     <style id="opphub-cta-css">
         /* ===== HOMEPAGE RESTYLE: Differentiate buttons by purpose ===== */
 
-        /* Hide Affiliate Payout Details — handled by ambassador onboarding now */
-        .elementor-element[data-id="95a2f99"] { display: none !important; }
+        /* Hide Affiliate Payout Details + "How do I get paid?" — handled by ambassador onboarding now */
+        .elementor-element[data-id="95a2f99"],
+        .elementor-element[data-id="85786cf"] { display: none !important; }
 
         /* "Get Started" (primary action) → Red */
         .elementor-element[data-id="5027090"] .elementor-button {
