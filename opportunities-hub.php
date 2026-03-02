@@ -2,7 +2,7 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 3.19.0
+ * Version: 3.20.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
@@ -658,11 +658,23 @@ function opphub_cta_html() {
         .elementor-element[data-id="cea65ef"] .elementor-button,
         .elementor-element[data-id="7482748"] .elementor-button,
         .elementor-element[data-id="acac7a0"] .elementor-button {
-            min-width: 420px !important;
+            width: 100% !important;
+            max-width: 420px !important;
             text-align: center !important;
             justify-content: center !important;
             padding: 10px 24px !important;
             font-size: 18px !important;
+            box-sizing: border-box !important;
+        }
+        /* Make button widget containers full-width so buttons center properly */
+        .elementor-element[data-id="5027090"],
+        .elementor-element[data-id="cea65ef"],
+        .elementor-element[data-id="7482748"],
+        .elementor-element[data-id="acac7a0"],
+        .elementor-element[data-id="24103f1"] {
+            width: 100% !important;
+            max-width: 100% !important;
+            text-align: center !important;
         }
 
         /* "Get Started" (primary action) → Red */
@@ -753,7 +765,8 @@ function opphub_cta_html() {
             display: inline-block !important;
             background: linear-gradient(135deg, #43A047, #2E7D32) !important;
             color: #fff !important;
-            min-width: 420px !important;
+            width: 100% !important;
+            max-width: 420px !important;
             padding: 10px 24px !important;
             border-radius: 3px !important;
             font-size: 18px !important;
@@ -762,7 +775,7 @@ function opphub_cta_html() {
             text-align: center !important;
             letter-spacing: 0.5px !important;
             transition: all 0.3s ease !important;
-            box-shadow: 0 2px 8px rgba(46,125,50,0.3) !important;
+            box-sizing: border-box !important;
         }
         .elementor-element[data-id="24103f1"] a:hover {
             background: linear-gradient(135deg, #2E7D32, #1B5E20) !important;
