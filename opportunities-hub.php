@@ -2,14 +2,14 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 3.8.0
+ * Version: 3.9.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
 
 if (!defined('ABSPATH')) exit;
 
-define('OPP_HUB_VERSION', '3.8.0');
+define('OPP_HUB_VERSION', '3.9.0');
 define('OPP_HUB_PATH', plugin_dir_path(__FILE__));
 define('OPP_HUB_URL', plugin_dir_url(__FILE__));
 
@@ -742,33 +742,35 @@ function opphub_cta_html() {
         }
 
         /* ===== LANGUAGE SWITCHER RESTYLE ===== */
-        /* Replace tiny "EN" flag with clear "Select Language" label */
         .gt_float_switcher .gt-selected .gt-current-lang {
             display: flex !important;
             align-items: center;
-            gap: 8px;
-            background: rgba(255,255,255,0.15) !important;
-            border: 1px solid rgba(255,255,255,0.3) !important;
-            border-radius: 8px !important;
-            padding: 8px 14px !important;
-            backdrop-filter: blur(4px);
+            gap: 6px;
+            background: rgba(255,255,255,0.95) !important;
+            border: 1px solid #ccc !important;
+            border-radius: 6px !important;
+            padding: 6px 10px !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         .gt_float_switcher .gt-selected .gt-current-lang .gt-lang-code {
-            font-size: 0 !important; /* Hide "EN" text */
+            font-size: 0 !important;
         }
         .gt_float_switcher .gt-selected .gt-current-lang .gt-lang-code::after {
-            content: "Select Language" !important;
-            font-size: 13px !important;
+            content: "Language" !important;
+            font-size: 11px !important;
             font-weight: 600;
-            letter-spacing: 0.3px;
+            color: #333;
             white-space: nowrap;
         }
         .gt_float_switcher .gt-selected .gt-current-lang img {
-            width: 20px !important;
-            height: 20px !important;
+            width: 18px !important;
+            height: 18px !important;
             border-radius: 50%;
         }
-        /* Dropdown options styling */
+        .gt_float_switcher .gt-selected .gt-current-lang .gt_float_switcher-arrow {
+            border-top-color: #333 !important;
+        }
+        /* Dropdown options */
         .gt_float_switcher .gt_options {
             border-radius: 8px !important;
             overflow: hidden;
@@ -788,6 +790,16 @@ function opphub_cta_html() {
             width: 20px !important;
             height: 20px !important;
             border-radius: 50%;
+        }
+        /* Desktop: show full text */
+        @media (min-width: 769px) {
+            .gt_float_switcher .gt-selected .gt-current-lang .gt-lang-code::after {
+                content: "Select Language" !important;
+                font-size: 13px !important;
+            }
+            .gt_float_switcher .gt-selected .gt-current-lang {
+                padding: 8px 14px !important;
+            }
         }
 
         /* ===== Plugin CTA: Single clean button ===== */
