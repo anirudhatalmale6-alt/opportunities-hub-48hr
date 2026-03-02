@@ -2,7 +2,7 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 3.10.0
+ * Version: 3.11.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
@@ -940,6 +940,14 @@ function opphub_video_language_swap() {
             h.className = 'opphub-video-heading';
             h.textContent = 'Watch How 48HoursReady Works';
             heroWidget.insertBefore(h, heroWidget.firstChild);
+        }
+    })();
+    /* Replace hero logo with new branding */
+    (function(){
+        var logoWidget = document.querySelector('[data-id="daeb49d"] img');
+        if (logoWidget) {
+            logoWidget.setAttribute('src', 'https://48hoursready.com/wp-content/uploads/2026/03/file_00000000a2e8722fbbf7b2fa01045fff.png');
+            logoWidget.setAttribute('srcset', '');
         }
     })();
     </script>
