@@ -936,12 +936,10 @@ function opphub_video_language_swap() {
     (function(){
         var heroWidget = document.querySelector('[data-id="a166997"]');
         if (heroWidget && !document.querySelector('.opphub-video-heading')) {
-            // Navigate up to the section-level container that holds the video
-            var videoSection = heroWidget.closest('[data-id="645d1f5"]') || heroWidget.closest('.e-con.e-child') || heroWidget.parentNode;
-            var h = document.createElement('div');
+            var h = document.createElement('h2');
             h.className = 'opphub-video-heading';
-            h.innerHTML = '<h2 style="text-align:center;color:#D32F2F;font-size:1.6rem;font-weight:700;margin:0 0 10px;padding:10px 15px;letter-spacing:0.5px;">Watch How 48HoursReady Works</h2>';
-            videoSection.parentNode.insertBefore(h, videoSection);
+            h.textContent = 'Watch How 48HoursReady Works';
+            heroWidget.insertBefore(h, heroWidget.firstChild);
         }
     })();
     </script>
