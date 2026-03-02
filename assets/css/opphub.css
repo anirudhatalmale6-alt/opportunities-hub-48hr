@@ -600,4 +600,223 @@ a.opphub-logo-text:hover {
         font-size: 12px;
         padding: 8px 12px;
     }
+
+    /* Testimonials mobile */
+    .opphub-testimonials-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .opphub-testimonial-form-box {
+        padding: 28px 20px !important;
+    }
+
+    .opphub-testimonial-form-box h2 {
+        font-size: 22px !important;
+    }
+}
+
+/* ============================================
+   TESTIMONIALS MODULE
+   ============================================ */
+
+/* Testimonials hero */
+.opphub-testimonials-hero {
+    border-bottom-color: var(--opphub-blue);
+}
+
+/* Testimonials section */
+.opphub-testimonials-section {
+    background: var(--opphub-gray);
+    padding: 64px 0;
+}
+
+.opphub-testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr));
+    gap: 24px;
+}
+
+/* Testimonial card */
+.opphub-testimonial-card {
+    background: var(--opphub-white);
+    border-radius: var(--opphub-radius);
+    padding: 28px;
+    border: 1px solid var(--opphub-gray-border);
+    transition: box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.opphub-testimonial-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+.opphub-testimonial-stars {
+    font-size: 20px;
+    color: #f9a825;
+    margin-bottom: 12px;
+    letter-spacing: 2px;
+}
+
+.opphub-testimonial-text {
+    font-size: 15px;
+    color: var(--opphub-text);
+    line-height: 1.7;
+    font-style: italic;
+    flex: 1;
+    margin-bottom: 20px;
+}
+
+.opphub-testimonial-author {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-top: 16px;
+    border-top: 1px solid var(--opphub-gray-border);
+}
+
+.opphub-testimonial-author strong {
+    font-size: 15px;
+    color: var(--opphub-dark);
+}
+
+.opphub-testimonial-country {
+    font-size: 13px;
+    color: var(--opphub-text-light);
+}
+
+/* Load more */
+.opphub-testimonials-loadmore {
+    text-align: center;
+    margin-top: 32px;
+}
+
+/* Empty state */
+.opphub-testimonials-empty {
+    text-align: center;
+    padding: 64px 20px;
+    color: var(--opphub-text-light);
+    font-size: 16px;
+}
+
+/* Form section */
+.opphub-testimonial-form-section {
+    background: var(--opphub-white);
+    padding: 64px 0;
+}
+
+.opphub-testimonial-form-box {
+    max-width: 640px;
+    margin: 0 auto;
+    background: var(--opphub-gray);
+    border-radius: 16px;
+    padding: 48px;
+    border: 1px solid var(--opphub-gray-border);
+}
+
+.opphub-testimonial-form-box h2 {
+    font-size: 28px;
+    font-weight: 800;
+    margin: 0 0 8px;
+    color: var(--opphub-dark);
+    text-align: center;
+}
+
+.opphub-testimonial-form-box > p {
+    text-align: center;
+    color: var(--opphub-text-light);
+    margin: 0 0 32px;
+    font-size: 15px;
+}
+
+/* CF7 form styling within testimonial form */
+.opphub-testimonial-form-box .wpcf7 {
+    max-width: 100%;
+}
+
+.opphub-cf7-row {
+    margin-bottom: 20px;
+}
+
+.opphub-cf7-row label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--opphub-dark);
+    margin-bottom: 6px;
+}
+
+.opphub-cf7-row label .required {
+    color: var(--opphub-red);
+}
+
+.opphub-cf7-row input[type="text"],
+.opphub-cf7-row textarea,
+.opphub-cf7-row select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--opphub-gray-border);
+    border-radius: var(--opphub-radius);
+    font-size: 15px;
+    color: var(--opphub-text);
+    background: var(--opphub-white);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    font-family: inherit;
+}
+
+.opphub-cf7-row input[type="text"]:focus,
+.opphub-cf7-row textarea:focus,
+.opphub-cf7-row select:focus {
+    outline: none;
+    border-color: var(--opphub-blue);
+    box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.12);
+}
+
+.opphub-cf7-row textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.opphub-cf7-consent {
+    font-size: 14px;
+    color: var(--opphub-text-light);
+}
+
+.opphub-cf7-consent .wpcf7-list-item {
+    margin: 0;
+}
+
+/* CF7 submit button override */
+.opphub-testimonial-form-box .wpcf7-submit {
+    display: block;
+    width: 100%;
+    padding: 14px 28px;
+    background: var(--opphub-red);
+    color: var(--opphub-white);
+    border: none;
+    border-radius: var(--opphub-radius);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 24px;
+}
+
+.opphub-testimonial-form-box .wpcf7-submit:hover {
+    background: var(--opphub-red-hover);
+}
+
+/* CF7 response messages */
+.opphub-testimonial-form-box .wpcf7-response-output {
+    border-radius: var(--opphub-radius);
+    padding: 12px 16px;
+    font-size: 14px;
+    margin: 16px 0 0;
+}
+
+.opphub-testimonial-form-box .wpcf7-mail-sent-ok,
+.opphub-testimonial-form-box .wpcf7 form.sent .wpcf7-response-output {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border-color: #a5d6a7;
 }

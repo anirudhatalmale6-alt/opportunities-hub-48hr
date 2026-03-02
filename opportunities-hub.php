@@ -2,14 +2,14 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 3.0.0
+ * Version: 3.1.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
 
 if (!defined('ABSPATH')) exit;
 
-define('OPP_HUB_VERSION', '3.0.0');
+define('OPP_HUB_VERSION', '3.1.0');
 define('OPP_HUB_PATH', plugin_dir_path(__FILE__));
 define('OPP_HUB_URL', plugin_dir_url(__FILE__));
 
@@ -1481,4 +1481,372 @@ function opphub_create_opportunity($title, $desc, $date, $link, $config) {
 register_deactivation_hook(__FILE__, 'opphub_clear_cron');
 function opphub_clear_cron() {
     wp_clear_scheduled_hook('opphub_cron_import');
+}
+
+// ============================================================
+// TESTIMONIALS MODULE
+// ============================================================
+
+// --- 1. Register Testimonial Custom Post Type ---
+add_action('init', 'opphub_register_testimonial_cpt');
+function opphub_register_testimonial_cpt() {
+    register_post_type('testimonial', [
+        'labels' => [
+            'name'               => 'Testimonials',
+            'singular_name'      => 'Testimonial',
+            'add_new'            => 'Add New',
+            'add_new_item'       => 'Add New Testimonial',
+            'edit_item'          => 'Edit Testimonial',
+            'new_item'           => 'New Testimonial',
+            'view_item'          => 'View Testimonial',
+            'search_items'       => 'Search Testimonials',
+            'not_found'          => 'No testimonials found',
+            'not_found_in_trash' => 'No testimonials in trash',
+            'all_items'          => 'All Testimonials',
+            'menu_name'          => 'Testimonials',
+        ],
+        'public'        => false,
+        'show_ui'       => true,
+        'show_in_menu'  => 'edit.php?post_type=opportunity',
+        'supports'      => ['title', 'editor'],
+        'menu_icon'     => 'dashicons-format-quote',
+        'has_archive'   => false,
+        'rewrite'       => false,
+    ]);
+}
+
+// --- 2. Testimonial Meta Box (Name, Country, Rating, Approval) ---
+add_action('add_meta_boxes', 'opphub_testimonial_meta_boxes');
+function opphub_testimonial_meta_boxes() {
+    add_meta_box(
+        'opphub_testimonial_details',
+        'Testimonial Details',
+        'opphub_testimonial_meta_callback',
+        'testimonial',
+        'normal',
+        'high'
+    );
+}
+
+function opphub_testimonial_meta_callback($post) {
+    wp_nonce_field('opphub_save_testimonial', 'opphub_testimonial_nonce');
+    $name    = get_post_meta($post->ID, '_testimonial_name', true);
+    $country = get_post_meta($post->ID, '_testimonial_country', true);
+    $rating  = get_post_meta($post->ID, '_testimonial_rating', true) ?: '';
+    $approved = get_post_meta($post->ID, '_testimonial_approved', true);
+    ?>
+    <table class="form-table">
+        <tr>
+            <th><label for="testimonial_name">Name</label></th>
+            <td><input type="text" id="testimonial_name" name="testimonial_name" value="<?php echo esc_attr($name); ?>" class="regular-text"></td>
+        </tr>
+        <tr>
+            <th><label for="testimonial_country">Country</label></th>
+            <td><input type="text" id="testimonial_country" name="testimonial_country" value="<?php echo esc_attr($country); ?>" class="regular-text"></td>
+        </tr>
+        <tr>
+            <th><label for="testimonial_rating">Rating (1–5)</label></th>
+            <td>
+                <select id="testimonial_rating" name="testimonial_rating">
+                    <option value="">No rating</option>
+                    <?php for ($i = 5; $i >= 1; $i--) : ?>
+                        <option value="<?php echo $i; ?>" <?php selected($rating, $i); ?>><?php echo str_repeat('&#9733;', $i); ?> (<?php echo $i; ?>)</option>
+                    <?php endfor; ?>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="testimonial_approved">Status</label></th>
+            <td>
+                <select id="testimonial_approved" name="testimonial_approved">
+                    <option value="0" <?php selected($approved, '0'); ?>>Pending Review</option>
+                    <option value="1" <?php selected($approved, '1'); ?>>Approved (Visible)</option>
+                </select>
+                <p class="description">Only approved testimonials appear on the public page.</p>
+            </td>
+        </tr>
+    </table>
+    <?php
+}
+
+add_action('save_post_testimonial', 'opphub_save_testimonial_meta');
+function opphub_save_testimonial_meta($post_id) {
+    if (!isset($_POST['opphub_testimonial_nonce']) || !wp_verify_nonce($_POST['opphub_testimonial_nonce'], 'opphub_save_testimonial')) return;
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
+    if (!current_user_can('edit_post', $post_id)) return;
+
+    $fields = ['name', 'country', 'rating', 'approved'];
+    foreach ($fields as $field) {
+        if (isset($_POST['testimonial_' . $field])) {
+            update_post_meta($post_id, '_testimonial_' . $field, sanitize_text_field($_POST['testimonial_' . $field]));
+        }
+    }
+}
+
+// --- 3. Admin Columns for Testimonials ---
+add_filter('manage_testimonial_posts_columns', 'opphub_testimonial_columns');
+function opphub_testimonial_columns($columns) {
+    $new = [];
+    foreach ($columns as $key => $label) {
+        $new[$key] = $label;
+        if ($key === 'title') {
+            $new['testimonial_name']    = 'Name';
+            $new['testimonial_country'] = 'Country';
+            $new['testimonial_rating']  = 'Rating';
+            $new['testimonial_status']  = 'Status';
+        }
+    }
+    return $new;
+}
+
+add_action('manage_testimonial_posts_custom_column', 'opphub_testimonial_column_content', 10, 2);
+function opphub_testimonial_column_content($column, $post_id) {
+    switch ($column) {
+        case 'testimonial_name':
+            echo esc_html(get_post_meta($post_id, '_testimonial_name', true));
+            break;
+        case 'testimonial_country':
+            echo esc_html(get_post_meta($post_id, '_testimonial_country', true));
+            break;
+        case 'testimonial_rating':
+            $r = get_post_meta($post_id, '_testimonial_rating', true);
+            echo $r ? str_repeat('&#9733;', intval($r)) : '—';
+            break;
+        case 'testimonial_status':
+            $approved = get_post_meta($post_id, '_testimonial_approved', true);
+            echo $approved === '1'
+                ? '<span style="color:#2e7d32;font-weight:600;">Approved</span>'
+                : '<span style="color:#e65100;font-weight:600;">Pending</span>';
+            break;
+    }
+}
+
+// --- 4. Quick Approve/Reject via Admin Row Actions ---
+add_filter('post_row_actions', 'opphub_testimonial_row_actions', 10, 2);
+function opphub_testimonial_row_actions($actions, $post) {
+    if ($post->post_type !== 'testimonial') return $actions;
+    $approved = get_post_meta($post->ID, '_testimonial_approved', true);
+    $nonce = wp_create_nonce('opphub_toggle_testimonial_' . $post->ID);
+    if ($approved === '1') {
+        $actions['opphub_reject'] = '<a href="' . admin_url('admin-post.php?action=opphub_toggle_testimonial&post_id=' . $post->ID . '&set=0&_wpnonce=' . $nonce) . '" style="color:#e65100;">Reject</a>';
+    } else {
+        $actions['opphub_approve'] = '<a href="' . admin_url('admin-post.php?action=opphub_toggle_testimonial&post_id=' . $post->ID . '&set=1&_wpnonce=' . $nonce) . '" style="color:#2e7d32;">Approve</a>';
+    }
+    return $actions;
+}
+
+add_action('admin_post_opphub_toggle_testimonial', 'opphub_handle_toggle_testimonial');
+function opphub_handle_toggle_testimonial() {
+    $post_id = intval($_GET['post_id'] ?? 0);
+    $set     = intval($_GET['set'] ?? 0);
+    if (!$post_id || !wp_verify_nonce($_GET['_wpnonce'] ?? '', 'opphub_toggle_testimonial_' . $post_id)) {
+        wp_die('Invalid request.');
+    }
+    if (!current_user_can('edit_post', $post_id)) wp_die('Unauthorized.');
+    update_post_meta($post_id, '_testimonial_approved', $set ? '1' : '0');
+    wp_safe_redirect(admin_url('edit.php?post_type=testimonial'));
+    exit;
+}
+
+// --- 5. Create CF7 Testimonial Form on Activation ---
+function opphub_create_cf7_testimonial_form() {
+    if (!class_exists('WPCF7_ContactForm')) return false;
+    if (get_option('opphub_cf7_testimonial_id')) return get_option('opphub_cf7_testimonial_id');
+
+    $form_template = '<div class="opphub-cf7-row">
+<label>Your Name <span class="required">*</span></label>
+[text* testimonial-name placeholder "Your full name"]
+</div>
+
+<div class="opphub-cf7-row">
+<label>Country <span class="required">*</span></label>
+[text* testimonial-country placeholder "e.g. Haiti, Jamaica, Dominican Republic"]
+</div>
+
+<div class="opphub-cf7-row">
+<label>Your Testimonial <span class="required">*</span></label>
+[textarea* testimonial-text x4 placeholder "Share your experience in 1-2 sentences..."]
+</div>
+
+<div class="opphub-cf7-row">
+<label>Rating (optional)</label>
+[select testimonial-rating include_blank "5 - Excellent" "4 - Very Good" "3 - Good" "2 - Fair" "1 - Poor"]
+</div>
+
+<div class="opphub-cf7-row opphub-cf7-consent">
+[acceptance testimonial-consent] I consent to having my testimonial published on the website. [/acceptance]
+</div>
+
+[submit class:opphub-btn class:opphub-btn-red "Submit Testimonial"]';
+
+    $mail_template = 'New testimonial submitted on [_date]:
+
+Name: [testimonial-name]
+Country: [testimonial-country]
+Rating: [testimonial-rating]
+
+Testimonial:
+[testimonial-text]
+
+---
+Review and approve at: ' . admin_url('edit.php?post_type=testimonial');
+
+    $cf7_post = wp_insert_post([
+        'post_type'    => 'wpcf7_contact_form',
+        'post_title'   => '48HoursReady Testimonial Form',
+        'post_status'  => 'publish',
+    ]);
+
+    if ($cf7_post && !is_wp_error($cf7_post)) {
+        update_post_meta($cf7_post, '_form', $form_template);
+        update_post_meta($cf7_post, '_mail', [
+            'active'             => true,
+            'subject'            => 'New Testimonial: [testimonial-name]',
+            'sender'             => get_bloginfo('name') . ' <wordpress@' . preg_replace('/^www\./', '', parse_url(home_url(), PHP_URL_HOST)) . '>',
+            'recipient'          => get_option('admin_email'),
+            'body'               => $mail_template,
+            'additional_headers' => 'Reply-To: ' . get_option('admin_email'),
+            'attachments'        => '',
+            'use_html'           => false,
+            'exclude_blank'      => false,
+        ]);
+        update_post_meta($cf7_post, '_mail_2', ['active' => false]);
+        update_post_meta($cf7_post, '_messages', [
+            'mail_sent_ok'        => 'Thank you! Your testimonial has been submitted and will appear once approved.',
+            'mail_sent_ng'        => 'Something went wrong. Please try again.',
+            'validation_error'    => 'Please fill in all required fields.',
+            'acceptance_missing'  => 'Please check the consent box to continue.',
+        ]);
+        update_option('opphub_cf7_testimonial_id', $cf7_post);
+        return $cf7_post;
+    }
+    return false;
+}
+
+// --- 6. Hook CF7 Submission → Create Testimonial Post (Pending) ---
+add_action('wpcf7_mail_sent', 'opphub_handle_testimonial_submission');
+function opphub_handle_testimonial_submission($contact_form) {
+    $cf7_id = get_option('opphub_cf7_testimonial_id');
+    if (!$cf7_id || $contact_form->id() != $cf7_id) return;
+
+    $submission = WPCF7_Submission::get_instance();
+    if (!$submission) return;
+
+    $data = $submission->get_posted_data();
+    $name       = sanitize_text_field($data['testimonial-name'] ?? '');
+    $country    = sanitize_text_field($data['testimonial-country'] ?? '');
+    $text       = sanitize_textarea_field($data['testimonial-text'] ?? '');
+    $rating_raw = sanitize_text_field($data['testimonial-rating'] ?? '');
+
+    // Extract numeric rating from "5 - Excellent" format
+    $rating = '';
+    if (preg_match('/^(\d)/', $rating_raw, $m)) {
+        $rating = $m[1];
+    }
+
+    if (empty($name) || empty($text)) return;
+
+    $post_id = wp_insert_post([
+        'post_type'    => 'testimonial',
+        'post_title'   => 'Testimonial from ' . $name,
+        'post_content' => $text,
+        'post_status'  => 'publish',
+    ]);
+
+    if ($post_id && !is_wp_error($post_id)) {
+        update_post_meta($post_id, '_testimonial_name', $name);
+        update_post_meta($post_id, '_testimonial_country', $country);
+        update_post_meta($post_id, '_testimonial_rating', $rating);
+        update_post_meta($post_id, '_testimonial_approved', '0'); // Pending by default
+    }
+}
+
+// --- 7. Testimonials Page Template ---
+add_filter('template_include', 'opphub_testimonials_page_template');
+function opphub_testimonials_page_template($template) {
+    if (is_page('testimonials') || (is_page() && get_page_template_slug() === 'opphub-testimonials.php')) {
+        $plugin_template = OPP_HUB_PATH . 'templates/testimonials-page.php';
+        if (file_exists($plugin_template)) {
+            return $plugin_template;
+        }
+    }
+    return $template;
+}
+
+add_filter('theme_page_templates', 'opphub_add_testimonials_template');
+function opphub_add_testimonials_template($templates) {
+    $templates['opphub-testimonials.php'] = 'Testimonials Page';
+    return $templates;
+}
+
+// --- 8. Create Testimonials Page + CF7 Form on Version Update ---
+add_action('init', 'opphub_maybe_setup_testimonials', 20);
+function opphub_maybe_setup_testimonials() {
+    if (get_option('opphub_testimonials_version') === OPP_HUB_VERSION) return;
+
+    // Create testimonials page if it doesn't exist
+    $page = get_page_by_path('testimonials');
+    if (!$page) {
+        wp_insert_post([
+            'post_title'   => 'Testimonials',
+            'post_name'    => 'testimonials',
+            'post_status'  => 'publish',
+            'post_type'    => 'page',
+            'post_content' => '<!-- This page uses the Testimonials template. Content is generated by the plugin. -->',
+            'meta_input'   => ['_wp_page_template' => 'opphub-testimonials.php'],
+        ]);
+    }
+
+    // Create CF7 form
+    opphub_create_cf7_testimonial_form();
+
+    update_option('opphub_testimonials_version', OPP_HUB_VERSION);
+    flush_rewrite_rules();
+}
+
+// --- 9. AJAX: Load More Testimonials ---
+add_action('wp_ajax_opphub_load_testimonials', 'opphub_ajax_load_testimonials');
+add_action('wp_ajax_nopriv_opphub_load_testimonials', 'opphub_ajax_load_testimonials');
+function opphub_ajax_load_testimonials() {
+    $page = intval($_POST['page'] ?? 1);
+    $per_page = 6;
+
+    $testimonials = new WP_Query([
+        'post_type'      => 'testimonial',
+        'posts_per_page' => $per_page,
+        'paged'          => $page,
+        'orderby'        => 'date',
+        'order'          => 'DESC',
+        'meta_query'     => [['key' => '_testimonial_approved', 'value' => '1']],
+    ]);
+
+    $html = '';
+    if ($testimonials->have_posts()) {
+        while ($testimonials->have_posts()) {
+            $testimonials->the_post();
+            $name    = get_post_meta(get_the_ID(), '_testimonial_name', true);
+            $country = get_post_meta(get_the_ID(), '_testimonial_country', true);
+            $rating  = get_post_meta(get_the_ID(), '_testimonial_rating', true);
+
+            $html .= '<div class="opphub-testimonial-card">';
+            if ($rating) {
+                $html .= '<div class="opphub-testimonial-stars">' . str_repeat('&#9733;', intval($rating)) . str_repeat('&#9734;', 5 - intval($rating)) . '</div>';
+            }
+            $html .= '<div class="opphub-testimonial-text">&ldquo;' . esc_html(get_the_content()) . '&rdquo;</div>';
+            $html .= '<div class="opphub-testimonial-author">';
+            $html .= '<strong>' . esc_html($name) . '</strong>';
+            if ($country) {
+                $html .= '<span class="opphub-testimonial-country">' . esc_html($country) . '</span>';
+            }
+            $html .= '</div>';
+            $html .= '</div>';
+        }
+        wp_reset_postdata();
+    }
+
+    wp_send_json_success([
+        'html'     => $html,
+        'has_more' => $testimonials->max_num_pages > $page,
+        'total'    => $testimonials->found_posts,
+    ]);
 }
