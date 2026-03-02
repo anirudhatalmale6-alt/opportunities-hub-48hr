@@ -2,7 +2,7 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 3.20.1
+ * Version: 3.21.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
@@ -334,7 +334,25 @@ function opphub_no_cache_headers() {
         header('Pragma: no-cache');
         header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
     }
+    // After plugin update, bust Cloudflare cache on homepage for 10 minutes
+    if ((is_front_page() || is_home()) && get_transient('opphub_cache_bust')) {
+        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+        header('Surrogate-Control: no-store');
+        header('CDN-Cache-Control: no-store');
+    }
 }
+
+// Set cache-bust transient on plugin activation/update
+register_activation_hook(__FILE__, 'opphub_bust_cache_on_activate');
+function opphub_bust_cache_on_activate() {
+    set_transient('opphub_cache_bust', true, 600); // 10 minutes
+}
+// Also bust on upgrader_process_complete (plugin update)
+add_action('upgrader_process_complete', function($upgrader, $options) {
+    if ($options['type'] === 'plugin') {
+        set_transient('opphub_cache_bust', true, 600);
+    }
+}, 10, 2);
 
 add_action('wp_enqueue_scripts', 'opphub_enqueue_assets');
 function opphub_enqueue_assets() {
@@ -1119,6 +1137,9 @@ function opphub_og_meta_tags() {
     <meta property="og:title" content="<?php echo esc_attr($og_title); ?>">
     <meta property="og:description" content="<?php echo esc_attr($og_description); ?>">
     <meta property="og:image" content="<?php echo esc_url($og_image); ?>">
+    <meta property="og:image:width" content="1536">
+    <meta property="og:image:height" content="1024">
+    <meta property="og:image:type" content="image/png">
     <meta property="og:url" content="<?php echo esc_url($og_url); ?>">
     <meta property="og:site_name" content="48HoursReady">
     <meta name="twitter:card" content="summary_large_image">
