@@ -2,14 +2,14 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 3.7.0
+ * Version: 3.8.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
 
 if (!defined('ABSPATH')) exit;
 
-define('OPP_HUB_VERSION', '3.7.0');
+define('OPP_HUB_VERSION', '3.8.0');
 define('OPP_HUB_PATH', plugin_dir_path(__FILE__));
 define('OPP_HUB_URL', plugin_dir_url(__FILE__));
 
@@ -741,6 +741,55 @@ function opphub_cta_html() {
             border-color: #B71C1C !important;
         }
 
+        /* ===== LANGUAGE SWITCHER RESTYLE ===== */
+        /* Replace tiny "EN" flag with clear "Select Language" label */
+        .gt_float_switcher .gt-selected .gt-current-lang {
+            display: flex !important;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.15) !important;
+            border: 1px solid rgba(255,255,255,0.3) !important;
+            border-radius: 8px !important;
+            padding: 8px 14px !important;
+            backdrop-filter: blur(4px);
+        }
+        .gt_float_switcher .gt-selected .gt-current-lang .gt-lang-code {
+            font-size: 0 !important; /* Hide "EN" text */
+        }
+        .gt_float_switcher .gt-selected .gt-current-lang .gt-lang-code::after {
+            content: "Select Language" !important;
+            font-size: 13px !important;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+        .gt_float_switcher .gt-selected .gt-current-lang img {
+            width: 20px !important;
+            height: 20px !important;
+            border-radius: 50%;
+        }
+        /* Dropdown options styling */
+        .gt_float_switcher .gt_options {
+            border-radius: 8px !important;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
+        }
+        .gt_float_switcher .gt_options a {
+            padding: 10px 14px !important;
+            font-size: 14px !important;
+            display: flex !important;
+            align-items: center;
+            gap: 8px;
+        }
+        .gt_float_switcher .gt_options a:hover {
+            background: #f0f0f0 !important;
+        }
+        .gt_float_switcher .gt_options a img {
+            width: 20px !important;
+            height: 20px !important;
+            border-radius: 50%;
+        }
+
         /* ===== Plugin CTA: Single clean button ===== */
         #opphub-inline-cta {
             text-align: center;
@@ -842,6 +891,87 @@ function opphub_cta_html() {
 }
 
 // ============================================================
+// 10b. LANGUAGE-SPECIFIC VIDEO SWAP
+// ============================================================
+add_action('wp_footer', 'opphub_video_language_swap', 1000);
+function opphub_video_language_swap() {
+    if (is_admin()) return;
+    // Only run on the homepage
+    if (!is_front_page() && !is_home()) return;
+
+    // Get video URLs from options (configurable in settings)
+    $videos = get_option('opphub_language_videos', []);
+    if (empty($videos) || !is_array($videos)) return;
+
+    $videos_json = wp_json_encode($videos);
+    ?>
+    <script>
+    /* Language-specific video swap — detects GTranslate language */
+    (function(){
+        var videos = <?php echo $videos_json; ?>;
+        var heroWidget = 'a166997'; // Main hero video widget ID
+
+        function getCurrentLang() {
+            // Check GTranslate cookie
+            var match = document.cookie.match(/googtrans=\/en\/(\w+)/);
+            if (match) return match[1];
+            // Check GTranslate URL hash
+            if (window.location.hash.match(/#googtrans/)) {
+                var hm = window.location.hash.match(/\/en\/(\w+)/);
+                if (hm) return hm[1];
+            }
+            // Check HTML lang attribute
+            var html_lang = document.documentElement.lang || '';
+            if (html_lang && html_lang !== 'en-US' && html_lang !== 'en') {
+                return html_lang.split('-')[0];
+            }
+            return 'en';
+        }
+
+        function swapVideo() {
+            var lang = getCurrentLang();
+            if (!videos[lang]) return; // No video for this language
+
+            var heroEl = document.querySelector('[data-id="' + heroWidget + '"] video');
+            if (!heroEl) return;
+
+            var currentSrc = heroEl.getAttribute('src') || '';
+            var targetSrc = videos[lang];
+            if (currentSrc === targetSrc) return; // Already correct
+
+            heroEl.setAttribute('src', targetSrc);
+            heroEl.load();
+        }
+
+        // Run on page load
+        if (document.readyState === 'complete') {
+            swapVideo();
+        } else {
+            window.addEventListener('load', swapVideo);
+        }
+
+        // Also watch for GTranslate language changes
+        var observer = new MutationObserver(function(mutations) {
+            swapVideo();
+        });
+        var gtEl = document.querySelector('.gt-current-lang');
+        if (gtEl) {
+            observer.observe(gtEl, { childList: true, subtree: true, characterData: true });
+        }
+
+        // Also listen for GTranslate click events
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.gt_float_switcher a[data-gt-lang]')) {
+                setTimeout(swapVideo, 500);
+                setTimeout(swapVideo, 1500);
+            }
+        });
+    })();
+    </script>
+    <?php
+}
+
+// ============================================================
 // 11. SETTINGS PAGE FOR CTA LINKS
 // ============================================================
 add_action('admin_menu', 'opphub_settings_menu');
@@ -868,10 +998,18 @@ function opphub_settings_page() {
 
     if (isset($_POST['opphub_save_settings']) && check_admin_referer('opphub_settings_nonce')) {
         update_option('opphub_structured_url', esc_url_raw($_POST['opphub_structured_url']));
+        // Save language video URLs
+        $lang_videos = [];
+        foreach (['en', 'fr', 'es', 'pt', 'ht'] as $lang) {
+            $url = esc_url_raw($_POST['opphub_video_' . $lang] ?? '');
+            if (!empty($url)) $lang_videos[$lang] = $url;
+        }
+        update_option('opphub_language_videos', $lang_videos);
         echo '<div class="notice notice-success"><p>Settings saved!</p></div>';
     }
 
     $structured_url = get_option('opphub_structured_url', '');
+    $lang_videos = get_option('opphub_language_videos', []);
     $last_import = get_option('opphub_last_import', 'Never');
     $import_count = get_option('opphub_last_import_count', 0);
     ?>
@@ -888,6 +1026,23 @@ function opphub_settings_page() {
                     </td>
                 </tr>
             </table>
+
+            <h2>Language-Specific Video Explainers</h2>
+            <p class="description">Enter the video URL for each language. The homepage hero video will automatically switch based on the visitor's selected language. Leave blank to use the default (Elementor) video.</p>
+            <table class="form-table">
+                <?php
+                $lang_labels = ['en' => 'English', 'fr' => 'French', 'es' => 'Spanish', 'pt' => 'Portuguese', 'ht' => 'Haitian Creole'];
+                foreach ($lang_labels as $code => $label) :
+                ?>
+                <tr>
+                    <th><label for="opphub_video_<?php echo $code; ?>"><?php echo $label; ?> Video URL</label></th>
+                    <td>
+                        <input type="url" id="opphub_video_<?php echo $code; ?>" name="opphub_video_<?php echo $code; ?>" value="<?php echo esc_url($lang_videos[$code] ?? ''); ?>" class="large-text" placeholder="https://48hoursready.com/wp-content/uploads/...">
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </table>
+
             <input type="submit" name="opphub_save_settings" class="button button-primary" value="Save Settings">
         </form>
 
