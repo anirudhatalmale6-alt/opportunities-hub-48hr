@@ -76,6 +76,7 @@ $testimonials = new WP_Query([
     <!-- ===== SUBMIT TESTIMONIAL FORM ===== -->
     <section class="opphub-testimonial-form-section" id="opphub-submit-testimonial">
         <div class="opphub-container">
+            <p class="opphub-testimonial-trust-line">Trusted by entrepreneurs across Haiti, the Caribbean &amp; the diaspora.</p>
             <div class="opphub-testimonial-form-box">
                 <h2>Share Your Experience</h2>
                 <p>Your feedback helps others discover 48HoursReady. Tell us about your experience!</p>

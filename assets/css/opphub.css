@@ -777,6 +777,25 @@ a.opphub-logo-text:hover {
     min-height: 100px;
 }
 
+/* Helper text under form fields */
+.opphub-cf7-helper {
+    display: block;
+    font-size: 12px;
+    color: var(--opphub-text-light);
+    margin-top: 4px;
+    font-weight: 400;
+}
+
+/* Trust line above form */
+.opphub-testimonial-trust-line {
+    text-align: center;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--opphub-blue);
+    margin: 0 0 24px;
+    letter-spacing: 0.3px;
+}
+
 .opphub-cf7-consent {
     font-size: 14px;
     color: var(--opphub-text-light);

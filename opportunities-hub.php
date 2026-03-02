@@ -2,14 +2,14 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 3.2.0
+ * Version: 3.3.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
 
 if (!defined('ABSPATH')) exit;
 
-define('OPP_HUB_VERSION', '3.2.0');
+define('OPP_HUB_VERSION', '3.3.0');
 define('OPP_HUB_PATH', plugin_dir_path(__FILE__));
 define('OPP_HUB_URL', plugin_dir_url(__FILE__));
 
@@ -1655,14 +1655,12 @@ function opphub_handle_toggle_testimonial() {
     exit;
 }
 
-// --- 5. Create CF7 Testimonial Form on Activation ---
-function opphub_create_cf7_testimonial_form() {
-    if (!class_exists('WPCF7_ContactForm')) return false;
-    if (get_option('opphub_cf7_testimonial_id')) return get_option('opphub_cf7_testimonial_id');
-
-    $form_template = '<div class="opphub-cf7-row">
+// --- 5. CF7 Testimonial Form Template ---
+function opphub_get_cf7_testimonial_template() {
+    return '<div class="opphub-cf7-row">
 <label>Your Name <span class="required">*</span></label>
 [text* testimonial-name placeholder "Your full name"]
+<span class="opphub-cf7-helper">First name + last initial is okay (e.g. John D.)</span>
 </div>
 
 <div class="opphub-cf7-row">
@@ -1671,13 +1669,13 @@ function opphub_create_cf7_testimonial_form() {
 </div>
 
 <div class="opphub-cf7-row">
-<label>Your Testimonial <span class="required">*</span></label>
-[textarea* testimonial-text x4 placeholder "Share your experience in 1-2 sentences..."]
+<label>Rating (optional)</label>
+[select testimonial-rating include_blank "5 - Excellent" "4 - Very Good" "3 - Good" "2 - Fair" "1 - Poor"]
 </div>
 
 <div class="opphub-cf7-row">
-<label>Rating (optional)</label>
-[select testimonial-rating include_blank "5 - Excellent" "4 - Very Good" "3 - Good" "2 - Fair" "1 - Poor"]
+<label>Your Testimonial <span class="required">*</span></label>
+[textarea* testimonial-text x4 placeholder "Share your experience in 1-2 sentences..."]
 </div>
 
 <div class="opphub-cf7-row opphub-cf7-consent">
@@ -1685,6 +1683,22 @@ function opphub_create_cf7_testimonial_form() {
 </div>
 
 [submit class:opphub-btn class:opphub-btn-red "Submit Testimonial"]';
+}
+
+// --- 5b. Create or Update CF7 Testimonial Form ---
+function opphub_create_cf7_testimonial_form() {
+    if (!class_exists('WPCF7_ContactForm')) return false;
+
+    // If form already exists, update it with the latest template
+    $existing_id = get_option('opphub_cf7_testimonial_id');
+    if ($existing_id && get_post($existing_id)) {
+        // Update form content with latest field order
+        $form_template = opphub_get_cf7_testimonial_template();
+        update_post_meta($existing_id, '_form', $form_template);
+        return $existing_id;
+    }
+
+    $form_template = opphub_get_cf7_testimonial_template();
 
     $mail_template = 'New testimonial submitted on [_date]:
 
@@ -1807,8 +1821,75 @@ function opphub_maybe_setup_testimonials() {
     // Create CF7 form
     opphub_create_cf7_testimonial_form();
 
+    // Seed sample testimonials if none exist
+    opphub_seed_sample_testimonials();
+
     update_option('opphub_testimonials_version', OPP_HUB_VERSION);
     flush_rewrite_rules();
+}
+
+// --- 8b. Seed Sample Testimonials ---
+function opphub_seed_sample_testimonials() {
+    $existing = get_posts([
+        'post_type'   => 'testimonial',
+        'post_status' => 'publish',
+        'numberposts' => 1,
+    ]);
+    if (!empty($existing)) return;
+
+    $samples = [
+        [
+            'name'    => 'Jean-Marc D.',
+            'country' => 'Haiti',
+            'text'    => '48HoursReady helped me structure my business documents in just two days. I went from having no formal paperwork to being bank-ready with a pitch deck and executive summary.',
+            'rating'  => '5',
+        ],
+        [
+            'name'    => 'Marie L.',
+            'country' => 'Haiti',
+            'text'    => 'I had been trying to get a loan for months. After 48HoursReady organized my business plan and financial projections, I was approved within weeks. Incredible service.',
+            'rating'  => '5',
+        ],
+        [
+            'name'    => 'Ricardo P.',
+            'country' => 'Dominican Republic',
+            'text'    => 'The team made my SME look professional and investor-ready. The pitch deck they created was clean, clear, and got me noticed by two funding organizations.',
+            'rating'  => '5',
+        ],
+        [
+            'name'    => 'Sophia T.',
+            'country' => 'Jamaica',
+            'text'    => 'As a first-time entrepreneur, I had no idea where to start with institutional funding applications. 48HoursReady walked me through the whole process and prepared everything.',
+            'rating'  => '4',
+        ],
+        [
+            'name'    => 'Emmanuel B.',
+            'country' => 'Haiti',
+            'text'    => 'I found an IDB opportunity through the Funding Hub and 48HoursReady helped me put together a strong application package. Fast, affordable, and professional.',
+            'rating'  => '5',
+        ],
+        [
+            'name'    => 'Claudine R.',
+            'country' => 'Haiti',
+            'text'    => 'The $199 package is worth every penny. My business went from an idea on paper to a fully structured enterprise with all the documents needed for funding.',
+            'rating'  => '5',
+        ],
+    ];
+
+    foreach ($samples as $s) {
+        $post_id = wp_insert_post([
+            'post_type'    => 'testimonial',
+            'post_title'   => 'Testimonial from ' . $s['name'],
+            'post_content' => $s['text'],
+            'post_status'  => 'publish',
+        ]);
+        if ($post_id && !is_wp_error($post_id)) {
+            update_post_meta($post_id, '_testimonial_name', $s['name']);
+            update_post_meta($post_id, '_testimonial_country', $s['country']);
+            update_post_meta($post_id, '_testimonial_rating', $s['rating']);
+            update_post_meta($post_id, '_testimonial_approved', '1');
+        }
+    }
 }
 
 // --- 9. AJAX: Load More Testimonials ---
