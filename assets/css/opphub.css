@@ -1044,3 +1044,497 @@ a.opphub-logo-text:hover {
         grid-template-columns: 1fr;
     }
 }
+
+/* ============================================
+   CORPORATE SERVICES PAGE
+   ============================================ */
+
+#opphub-corporate {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--opphub-text);
+    line-height: 1.6;
+}
+
+#opphub-corporate *,
+#opphub-corporate *::before,
+#opphub-corporate *::after {
+    box-sizing: border-box;
+}
+
+/* Hero */
+.opphub-corp-hero {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    padding: 80px 0 70px;
+    text-align: center;
+    color: var(--opphub-white);
+}
+
+.opphub-corp-hero-title {
+    font-size: 40px;
+    font-weight: 800;
+    color: var(--opphub-white);
+    margin: 0 0 18px;
+    line-height: 1.2;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.opphub-corp-hero-subtitle {
+    font-size: 18px;
+    color: rgba(255,255,255,0.8);
+    max-width: 650px;
+    margin: 0 auto 36px;
+    line-height: 1.6;
+}
+
+.opphub-corp-hero-cta {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.opphub-corp-btn-whatsapp {
+    background: #25D366;
+    color: var(--opphub-white);
+}
+.opphub-corp-btn-whatsapp:hover {
+    background: #1da851;
+    color: var(--opphub-white);
+    text-decoration: none;
+}
+
+/* Section title */
+.opphub-corp-section-title {
+    font-size: 32px;
+    font-weight: 800;
+    text-align: center;
+    color: var(--opphub-dark);
+    margin: 0 0 48px;
+}
+
+/* Packages section */
+.opphub-corp-packages {
+    background: var(--opphub-gray);
+    padding: 72px 0;
+}
+
+.opphub-corp-packages-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+    align-items: start;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* Pricing card */
+.opphub-corp-card {
+    background: var(--opphub-white);
+    border-radius: 12px;
+    border: 2px solid var(--opphub-gray-border);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    position: relative;
+}
+
+.opphub-corp-card:hover {
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    transform: translateY(-4px);
+}
+
+/* Popular card */
+.opphub-corp-card-popular {
+    border-color: var(--opphub-red);
+    box-shadow: 0 8px 32px rgba(211,47,47,0.15);
+    transform: scale(1.03);
+}
+
+.opphub-corp-card-popular:hover {
+    transform: scale(1.03) translateY(-4px);
+    box-shadow: 0 12px 40px rgba(211,47,47,0.2);
+}
+
+.opphub-corp-card-badge {
+    background: var(--opphub-red);
+    color: var(--opphub-white);
+    text-align: center;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Card header */
+.opphub-corp-card-header {
+    padding: 32px 28px 24px;
+    text-align: center;
+    border-bottom: 1px solid var(--opphub-gray-border);
+}
+
+.opphub-corp-card-price {
+    font-size: 48px;
+    font-weight: 800;
+    color: var(--opphub-dark);
+    display: block;
+    line-height: 1;
+    margin-bottom: 10px;
+}
+
+.opphub-corp-card-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--opphub-dark);
+    margin: 0 0 8px;
+}
+
+.opphub-corp-card-desc {
+    font-size: 14px;
+    color: var(--opphub-text-light);
+    margin: 0;
+}
+
+/* Card body */
+.opphub-corp-card-body {
+    padding: 24px 28px;
+    flex: 1;
+}
+
+/* Business Kit highlight box */
+.opphub-corp-kit-highlight {
+    background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+    border: 1px solid #bbdefb;
+    border-radius: 8px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+}
+
+.opphub-corp-kit-label {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--opphub-blue);
+    margin-bottom: 12px;
+}
+
+.opphub-corp-kit-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.opphub-corp-kit-list li {
+    font-size: 14px;
+    color: var(--opphub-text);
+    padding: 4px 0;
+    padding-left: 24px;
+    position: relative;
+}
+
+.opphub-corp-kit-list li::before {
+    content: "\2714";
+    color: #2e7d32;
+    font-weight: 700;
+    position: absolute;
+    left: 0;
+}
+
+/* Extras label */
+.opphub-corp-extras-label {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--opphub-red);
+    margin-bottom: 10px;
+}
+
+/* Features list */
+.opphub-corp-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px;
+}
+
+.opphub-corp-features li {
+    font-size: 14px;
+    color: var(--opphub-text);
+    padding: 6px 0 6px 24px;
+    position: relative;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+}
+
+.opphub-corp-features li:last-child {
+    border-bottom: none;
+}
+
+.opphub-corp-features li::before {
+    content: "\2714";
+    color: var(--opphub-blue);
+    font-weight: 700;
+    position: absolute;
+    left: 0;
+}
+
+/* Includes note (for $1500 card) */
+.opphub-corp-includes-note {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--opphub-dark);
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--opphub-gray-border);
+}
+
+/* Add-ons */
+.opphub-corp-addons {
+    background: var(--opphub-gray);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+}
+
+.opphub-corp-addons strong {
+    display: block;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--opphub-text-light);
+    margin-bottom: 8px;
+}
+
+.opphub-corp-addons ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.opphub-corp-addons ul li {
+    font-size: 13px;
+    color: var(--opphub-text-light);
+    padding: 3px 0 3px 20px;
+    position: relative;
+}
+
+.opphub-corp-addons ul li::before {
+    content: "+";
+    color: var(--opphub-blue);
+    font-weight: 700;
+    position: absolute;
+    left: 0;
+}
+
+/* Positioning */
+.opphub-corp-positioning {
+    font-size: 13px;
+    color: var(--opphub-text-light);
+    margin-bottom: 0;
+    line-height: 1.6;
+}
+
+.opphub-corp-positioning strong {
+    display: block;
+    color: var(--opphub-dark);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 4px;
+}
+
+/* Delivery note */
+.opphub-corp-delivery {
+    font-size: 13px;
+    color: var(--opphub-text-light);
+    font-style: italic;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--opphub-gray-border);
+}
+
+/* Card footer */
+.opphub-corp-card-footer {
+    padding: 20px 28px 28px;
+}
+
+.opphub-corp-card-btn {
+    display: block;
+    width: 100%;
+    padding: 14px 28px;
+    font-size: 16px;
+    text-align: center;
+}
+
+/* Revenue tiers */
+.opphub-corp-tiers {
+    background: var(--opphub-white);
+    padding: 48px 0;
+}
+
+.opphub-corp-tiers-grid {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.opphub-corp-tier {
+    text-align: center;
+    padding: 16px 24px;
+    background: var(--opphub-gray);
+    border-radius: 8px;
+}
+
+.opphub-corp-tier-price {
+    display: block;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--opphub-dark);
+}
+
+.opphub-corp-tier-label {
+    display: block;
+    font-size: 13px;
+    color: var(--opphub-text-light);
+    margin-top: 4px;
+}
+
+.opphub-corp-tier-arrow {
+    font-size: 24px;
+    color: var(--opphub-blue);
+    font-weight: 700;
+}
+
+/* Motivational tagline */
+.opphub-corp-tagline {
+    background: linear-gradient(135deg, #1565C0 0%, #D32F2F 100%);
+    padding: 72px 0;
+    text-align: center;
+}
+
+.opphub-corp-quote {
+    max-width: 700px;
+    margin: 0 auto 32px;
+    padding: 0;
+    border: none;
+}
+
+.opphub-corp-quote p {
+    font-size: 24px;
+    color: var(--opphub-white);
+    margin: 0 0 8px;
+    line-height: 1.4;
+}
+
+.opphub-corp-quote p:last-child {
+    margin-bottom: 0;
+}
+
+/* Corporate responsive */
+@media (max-width: 960px) {
+    .opphub-corp-packages-grid {
+        grid-template-columns: 1fr;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .opphub-corp-card-popular {
+        transform: none;
+        order: -1;
+    }
+
+    .opphub-corp-card-popular:hover {
+        transform: translateY(-4px);
+    }
+}
+
+@media (max-width: 768px) {
+    #opphub-corporate {
+        overflow-x: hidden;
+    }
+
+    .opphub-corp-hero {
+        padding: 48px 0 40px;
+    }
+
+    .opphub-corp-hero-title {
+        font-size: 26px;
+    }
+
+    .opphub-corp-hero-subtitle {
+        font-size: 15px;
+    }
+
+    .opphub-corp-hero-cta {
+        flex-direction: column;
+        padding: 0 10px;
+    }
+
+    .opphub-corp-hero-cta .opphub-btn {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .opphub-corp-section-title {
+        font-size: 24px;
+        margin-bottom: 28px;
+    }
+
+    .opphub-corp-packages {
+        padding: 40px 0;
+    }
+
+    .opphub-corp-card-header {
+        padding: 24px 20px 20px;
+    }
+
+    .opphub-corp-card-price {
+        font-size: 38px;
+    }
+
+    .opphub-corp-card-body {
+        padding: 20px;
+    }
+
+    .opphub-corp-card-footer {
+        padding: 16px 20px 24px;
+    }
+
+    .opphub-corp-tiers {
+        padding: 32px 0;
+    }
+
+    .opphub-corp-tiers-grid {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .opphub-corp-tier-arrow {
+        transform: rotate(90deg);
+    }
+
+    .opphub-corp-tier {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 20px;
+    }
+
+    .opphub-corp-tier-price {
+        font-size: 20px;
+    }
+
+    .opphub-corp-tagline {
+        padding: 48px 0;
+    }
+
+    .opphub-corp-quote p {
+        font-size: 18px;
+    }
+}
