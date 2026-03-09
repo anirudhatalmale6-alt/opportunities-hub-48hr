@@ -73,7 +73,7 @@ $whatsapp_url = $whatsapp_number ? 'https://wa.me/' . preg_replace('/[^0-9]/', '
                         <div class="opphub-corp-delivery">Delivery: 48&#8211;72 hours depending on materials.</div>
                     </div>
                     <div class="opphub-corp-card-footer">
-                        <a href="<?php echo esc_url($structured_url); ?>" class="opphub-btn opphub-btn-blue opphub-corp-card-btn">Get Started</a>
+                        <a href="https://buy.stripe.com/fZu8wI7SocWs3B67Z3gYU02" class="opphub-btn opphub-btn-blue opphub-corp-card-btn">Get Started</a>
                     </div>
                 </div>
 
@@ -81,12 +81,12 @@ $whatsapp_url = $whatsapp_number ? 'https://wa.me/' . preg_replace('/[^0-9]/', '
                 <div class="opphub-corp-card opphub-corp-card-popular">
                     <div class="opphub-corp-card-badge">Most Popular</div>
                     <div class="opphub-corp-card-header">
-                        <span class="opphub-corp-card-price">$1,500</span>
+                        <span class="opphub-corp-card-price">$499</span>
                         <h3 class="opphub-corp-card-name">Corporate Growth Package</h3>
                         <p class="opphub-corp-card-desc">For companies ready to grow or seek funding.</p>
                     </div>
                     <div class="opphub-corp-card-body">
-                        <div class="opphub-corp-includes-note">Includes everything in the $299 package PLUS:</div>
+                        <div class="opphub-corp-includes-note">Includes everything in the Business Launch Package PLUS:</div>
                         <ul class="opphub-corp-features">
                             <li>Full Business Plan (15&#8211;20 pages)</li>
                             <li>Investor Pitch Deck</li>
@@ -102,14 +102,14 @@ $whatsapp_url = $whatsapp_number ? 'https://wa.me/' . preg_replace('/[^0-9]/', '
                         </div>
                     </div>
                     <div class="opphub-corp-card-footer">
-                        <a href="<?php echo esc_url($structured_url); ?>" class="opphub-btn opphub-btn-red opphub-corp-card-btn">Get Started</a>
+                        <a href="https://buy.stripe.com/6oUeV62y4bSoc7C6UZgYU03" class="opphub-btn opphub-btn-red opphub-corp-card-btn">Get Started</a>
                     </div>
                 </div>
 
                 <!-- Package 3: Enterprise / Institutional -->
                 <div class="opphub-corp-card">
                     <div class="opphub-corp-card-header">
-                        <span class="opphub-corp-card-price">$5,000+</span>
+                        <span class="opphub-corp-card-price">$899</span>
                         <h3 class="opphub-corp-card-name">Enterprise / Institutional Package</h3>
                         <p class="opphub-corp-card-desc">For corporations, NGOs, institutions and large projects.</p>
                     </div>
@@ -138,7 +138,7 @@ $whatsapp_url = $whatsapp_number ? 'https://wa.me/' . preg_replace('/[^0-9]/', '
                         </div>
                     </div>
                     <div class="opphub-corp-card-footer">
-                        <a href="<?php echo esc_url($structured_url); ?>" class="opphub-btn opphub-btn-blue opphub-corp-card-btn">Contact Us</a>
+                        <a href="https://buy.stripe.com/5kQ3coc8EbSo9Zu6UZgYU04" class="opphub-btn opphub-btn-blue opphub-corp-card-btn">Get Started</a>
                     </div>
                 </div>
 
@@ -161,12 +161,12 @@ $whatsapp_url = $whatsapp_number ? 'https://wa.me/' . preg_replace('/[^0-9]/', '
                 </div>
                 <div class="opphub-corp-tier-arrow">&#8594;</div>
                 <div class="opphub-corp-tier">
-                    <span class="opphub-corp-tier-price">$1,500</span>
+                    <span class="opphub-corp-tier-price">$499</span>
                     <span class="opphub-corp-tier-label">Business clients</span>
                 </div>
                 <div class="opphub-corp-tier-arrow">&#8594;</div>
                 <div class="opphub-corp-tier">
-                    <span class="opphub-corp-tier-price">$5K+</span>
+                    <span class="opphub-corp-tier-price">$899</span>
                     <span class="opphub-corp-tier-label">Institutional projects</span>
                 </div>
             </div>
