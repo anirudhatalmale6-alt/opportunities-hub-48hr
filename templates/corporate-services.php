@@ -24,11 +24,8 @@ $whatsapp_url = $whatsapp_number ? 'https://wa.me/' . preg_replace('/[^0-9]/', '
             <h1 class="opphub-corp-hero-title">Corporate Business Plans, Proposals &amp; Communication Materials</h1>
             <p class="opphub-corp-hero-subtitle">From startup launches to institutional proposals, we help organizations structure their ideas and present them professionally.</p>
             <div class="opphub-corp-hero-cta">
-                <a href="<?php echo esc_url($structured_url); ?>" class="opphub-btn opphub-btn-red opphub-btn-lg">Request a Quote</a>
-                <a href="<?php echo esc_url($structured_url); ?>" class="opphub-btn opphub-btn-blue opphub-btn-lg">Start Your Project</a>
-                <?php if ($whatsapp_number) : ?>
-                <a href="<?php echo esc_url($whatsapp_url); ?>" target="_blank" rel="noopener" class="opphub-btn opphub-corp-btn-whatsapp opphub-btn-lg">WhatsApp Consultation</a>
-                <?php endif; ?>
+                <a href="https://wa.me/50941902005?text=<?php echo urlencode('Hi, I\'d like to request a quote for corporate services.'); ?>" target="_blank" rel="noopener" class="opphub-btn opphub-btn-red opphub-btn-lg">Request a Quote via WhatsApp</a>
+                <a href="mailto:info@48hoursready.com?subject=<?php echo urlencode('Corporate Services Quote Request'); ?>" class="opphub-btn opphub-btn-blue opphub-btn-lg">Email Us</a>
             </div>
         </div>
     </section>

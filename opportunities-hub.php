@@ -2,7 +2,7 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 3.25.0
+ * Version: 3.26.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
