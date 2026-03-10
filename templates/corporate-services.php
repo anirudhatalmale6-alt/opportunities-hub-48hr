@@ -48,6 +48,8 @@ $whatsapp_url = $whatsapp_number ? 'https://wa.me/' . preg_replace('/[^0-9]/', '
                             <li>Logo Design</li>
                             <li>Business Cards</li>
                             <li>Executive Summary</li>
+                            <li>Pitch Deck 9+ GPT Verified</li>
+                            <li>Video Explainer</li>
                             <li>One-Page Website (Business Overview, Services &amp; Contact)</li>
                         </ul>
                         <div class="opphub-corp-positioning">
