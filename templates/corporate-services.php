@@ -64,6 +64,7 @@ $whatsapp_url = $whatsapp_number ? 'https://wa.me/' . preg_replace('/[^0-9]/', '
                             <li>Basic Business Plan</li>
                             <li>Banner Design (for events or promotion)</li>
                             <li>1 Professional Proposal Document</li>
+                            <li>One-Page Website (Business Overview, Services &amp; Contact)</li>
                         </ul>
                         <!-- Positioning -->
                         <div class="opphub-corp-positioning">
@@ -95,6 +96,7 @@ $whatsapp_url = $whatsapp_number ? 'https://wa.me/' . preg_replace('/[^0-9]/', '
                             <li>Professional Proposal Design</li>
                             <li>Executive Summary for Investors</li>
                             <li>Business Strategy Update for existing businesses</li>
+                            <li>One-Page Website (Business Overview, Services &amp; Contact)</li>
                         </ul>
                         <div class="opphub-corp-positioning">
                             <strong>Best for:</strong>
@@ -122,6 +124,7 @@ $whatsapp_url = $whatsapp_number ? 'https://wa.me/' . preg_replace('/[^0-9]/', '
                             <li>Conference / Event Branding</li>
                             <li>Corporate Strategy &amp; Expansion Plan</li>
                             <li>Institutional Partnership Deck</li>
+                            <li>One-Page Website (Business Overview, Services &amp; Contact)</li>
                         </ul>
                         <div class="opphub-corp-addons">
                             <strong>Optional add-ons:</strong>
