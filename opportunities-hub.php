@@ -2,7 +2,7 @@
 /**
  * Plugin Name: 48HoursReady Opportunities Hub
  * Description: Funding & Institutions Hub with custom post type, taxonomies, landing page, and RSS feed.
- * Version: 3.23.0
+ * Version: 3.24.0
  * Author: 48HoursReady
  * Text Domain: opportunities-hub
  */
@@ -958,7 +958,8 @@ function opphub_cta_html() {
 
         var cta = document.createElement('div');
         cta.id = 'opphub-inline-cta';
-        cta.innerHTML = '<a href="<?php echo $hub_url; ?>">&#128176; Explore Funding Opportunities</a>' +
+        cta.innerHTML = '<a href="<?php echo esc_url(home_url('/corporate-services/')); ?>">&#128188; View Corporate Packages</a>' +
+            '<a href="<?php echo $hub_url; ?>" style="margin-top:12px;background:linear-gradient(135deg,#1565C0,#0D47A1);">&#128176; Explore Funding Opportunities</a>' +
             '<span class="opphub-cta-sub">&#11088; <a href="<?php echo esc_url(home_url('/testimonials/')); ?>">Read what our clients say</a></span>';
 
         // Primary: Insert before the "Choose the application type" parent section
