@@ -39,6 +39,58 @@ $whatsapp_url = $whatsapp_number ? 'https://wa.me/' . preg_replace('/[^0-9]/', '
             <h2 class="opphub-corp-section-title">Choose Your Package</h2>
             <div class="opphub-corp-packages-grid">
 
+                <!-- Package 0A: Starter -->
+                <div class="opphub-corp-card">
+                    <div class="opphub-corp-card-header">
+                        <span class="opphub-corp-card-price">$79</span>
+                        <h3 class="opphub-corp-card-name">Starter Package</h3>
+                        <p class="opphub-corp-card-desc">Essential branding to get your business started.</p>
+                    </div>
+                    <div class="opphub-corp-card-body">
+                        <ul class="opphub-corp-features">
+                            <li>Logo Design</li>
+                            <li>Business Cards</li>
+                            <li>Executive Summary</li>
+                            <li>One-Page Website (Business Overview, Services &amp; Contact)</li>
+                        </ul>
+                        <div class="opphub-corp-positioning">
+                            <strong>Perfect for:</strong>
+                            <span>New entrepreneurs, freelancers, and small business owners getting started</span>
+                        </div>
+                        <div class="opphub-corp-delivery">Delivery: 24&#8211;48 hours.</div>
+                    </div>
+                    <div class="opphub-corp-card-footer">
+                        <a href="<?php echo esc_url($structured_url); ?>" class="opphub-btn opphub-btn-blue opphub-corp-card-btn">Get Started</a>
+                    </div>
+                </div>
+
+                <!-- Package 0B: Business Kit -->
+                <div class="opphub-corp-card">
+                    <div class="opphub-corp-card-header">
+                        <span class="opphub-corp-card-price">$199</span>
+                        <h3 class="opphub-corp-card-name">Business Kit</h3>
+                        <p class="opphub-corp-card-desc">The complete 48HoursReady package to present your business professionally.</p>
+                    </div>
+                    <div class="opphub-corp-card-body">
+                        <ul class="opphub-corp-features">
+                            <li>Logo Design</li>
+                            <li>Business Cards</li>
+                            <li>Executive Summary</li>
+                            <li>Project Plan for Banks &amp; Institutions</li>
+                            <li>Video Explainer</li>
+                            <li>One-Page Website (Business Overview, Services &amp; Contact)</li>
+                        </ul>
+                        <div class="opphub-corp-positioning">
+                            <strong>Perfect for:</strong>
+                            <span>Entrepreneurs ready to present to banks, partners, and investors</span>
+                        </div>
+                        <div class="opphub-corp-delivery">Delivery: 48 hours.</div>
+                    </div>
+                    <div class="opphub-corp-card-footer">
+                        <a href="<?php echo esc_url($structured_url); ?>" class="opphub-btn opphub-btn-blue opphub-corp-card-btn">Get Started</a>
+                    </div>
+                </div>
+
                 <!-- Package 1: Business Launch -->
                 <div class="opphub-corp-card">
                     <div class="opphub-corp-card-header">
@@ -153,6 +205,11 @@ $whatsapp_url = $whatsapp_number ? 'https://wa.me/' . preg_replace('/[^0-9]/', '
     <section class="opphub-corp-tiers">
         <div class="opphub-container">
             <div class="opphub-corp-tiers-grid">
+                <div class="opphub-corp-tier">
+                    <span class="opphub-corp-tier-price">$79</span>
+                    <span class="opphub-corp-tier-label">Starters</span>
+                </div>
+                <div class="opphub-corp-tier-arrow">&#8594;</div>
                 <div class="opphub-corp-tier">
                     <span class="opphub-corp-tier-price">$199</span>
                     <span class="opphub-corp-tier-label">Entry customers</span>
