@@ -1179,7 +1179,7 @@ a.opphub-logo-text:hover {
 .opphub-corp-card-price {
     font-size: 48px;
     font-weight: 800;
-    color: var(--opphub-dark);
+    color: #D32F2F;
     display: block;
     line-height: 1;
     margin-bottom: 10px;
@@ -1394,7 +1394,7 @@ a.opphub-logo-text:hover {
     display: block;
     font-size: 22px;
     font-weight: 800;
-    color: var(--opphub-dark);
+    color: #D32F2F;
 }
 
 .opphub-corp-tier-label {
